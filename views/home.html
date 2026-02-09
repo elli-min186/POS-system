@@ -1,12 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="css/home.css" >
+    <title>TechPOS</title>
+    <link rel="stylesheet" href="/POS-System/public/css/home.css">
+    <script src="/POS-System/public/js/home.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
-    
+
+    <nav class="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i data-lucide="store" style="color:white;"></i></div>
+            <div class="brand-text">
+                <h1>TechPOS</h1>
+                <p>Terminal #01</p>
+            </div>
+        </div>
+
+        <div class="category-header">Categories</div>
+
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="filterCategory('all', this)">
+                <div class="nav-left"><i data-lucide="layout-grid"></i> All Items</div>
+                <span class="badge" id="count-all">0</span>
+            </div>
+            <div class="nav-item" onclick="filterCategory('Laptops', this)">
+                <div class="nav-left"><i data-lucide="laptop"></i> Laptops</div>
+                <span class="badge" id="count-Laptops">0</span>
+            </div>
+            <div class="nav-item" onclick="filterCategory('Smartphones', this)">
+                <div class="nav-left"><i data-lucide="smartphone"></i> Phones</div>
+                <span class="badge" id="count-Smartphones">0</span>
+            </div>
+            <div class="nav-item" onclick="filterCategory('Tablets', this)">
+                <div class="nav-left"><i data-lucide="tablet"></i> Tablets</div>
+                <span class="badge" id="count-Tablets">0</span>
+            </div>
+            <div class="nav-item" onclick="filterCategory('Audio', this)">
+                <div class="nav-left"><i data-lucide="headphones"></i> Audio</div>
+                <span class="badge" id="count-Audio">0</span>
+            </div>
+            <div class="nav-item" onclick="filterCategory('Accessories', this)">
+                <div class="nav-left"><i data-lucide="plug"></i> Accessories</div>
+                <span class="badge" id="count-Accessories">0</span>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="nav-item">
+                    <div class="nav-left"><i data-lucide="settings"></i> Settings</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div class="page-title" id="pageTitle">All Items <span class="item-count" id="totalItemCount">0 items</span>
+            </div>
+
+            <div class="search-bar">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by name or SKU..." onkeyup="searchProducts()">
+            </div>
+
+            <div class="user-info">
+                <div class="clock-container">
+                    <i data-lucide="clock" class="icon-sm"></i>
+                    <span id="clock-text">--:-- PM</span>
+                </div>
+                <div class="vertical-divider"></div>
+                <div class="user-pill">
+                    <span class="user-avatar">JD</span>
+                    Jane D.
+                    <i data-lucide="chevron-down" class="icon-xs"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+        </div>
+
+        <div class="system-bar">
+            <div><span class="status-dot"></span> System Online &nbsp;&nbsp; Printer: <span
+                    class="text-gray">Ready</span></div>
+            <div id="dateDisplay">Sunday, Feb 8, 2026</div>
+        </div>
+    </main>
+
+    <aside class="cart-panel">
+        <div class="cart-header">
+            <div class="cart-title"><i data-lucide="receipt"></i> Current Order <span class="cart-count"
+                    id="cartCount">0</span></div>
+            <div class="clear-btn" onclick="clearCart()"><i data-lucide="rotate-ccw" class="icon-sm"></i> Clear</div>
+        </div>
+
+        <div class="action-grid">
+            <div class="action-btn">
+                <i data-lucide="user"></i>
+                <span>Customer</span>
+            </div>
+            <div class="action-btn">
+                <i data-lucide="percent"></i>
+                <span>Discount</span>
+            </div>
+            <div class="action-btn">
+                <i data-lucide="circle-pause"></i>
+                <span>Hold</span>
+            </div>
+        </div>
+
+        <div class="cart-items" id="cartItemsContainer">
+            <div class="empty-state">Cart is empty</div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subTotalDisplay">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (8%)</span>
+                <span id="taxDisplay">$0.00</span>
+            </div>
+            <div class="total-row">
+                <span>Total</span>
+                <span id="totalDisplay">$0.00</span>
+            </div>
+
+            <button class="pay-btn" onclick="processPayment()">
+                <i data-lucide="credit-card" style="color:white"></i> <span id="payButtonText">Pay $0.00</span>
+            </button>
+        </div>
+    </aside>
 </body>
+
 </html>
