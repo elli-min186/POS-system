@@ -16,3 +16,19 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server started on port: " + PORT);
 });
+
+app.get("/earnings", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "earnings.html"));
+});
+
+// TEMP sales data for earnings page
+app.get("/api/sales", (req, res) => {
+  res.json([
+    { item: "Keyboard", price: 50 },
+    { item: "Mouse", price: 25 }
+  ]);
+});
+
+app.listen(PORT, () => {
+  console.log("Server started on port: " + PORT);
+});
