@@ -75,6 +75,29 @@ app.post("/api/items", (req, res) => {
   res.status(201).json(newItem);
 });
 
+// DELETE a product by ID
+app.delete("/api/items/:id", (req, res) => {
+
+  const products = readData();
+
+  const id = parseInt(req.params.id);
+
+  const newProducts = products.filter(
+    (item) => item.product_id !== id
+  );
+
+  if (newProducts.length === products.length) {
+    return res.status(404).json({ error: "Item not found" });
+  }
+
+  writeData(newProducts);
+
+  console.log(`Deleted Item ID: ${id}`);
+
+  res.status(200).json({ message: "Item deleted" });
+});
+
+
 // --- GET sales for earnings page ---
 app.get("/api/sales", (req, res) => {
   const products = readData();
