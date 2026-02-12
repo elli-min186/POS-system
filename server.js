@@ -11,12 +11,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const DATA_FILE = path.join(__dirname, "data", "products.json");
 
+// --- Helper functions ---
 const readData = () => {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      console.log("File not found, returning empty list.");
-      return [];
-    }
+    if (!fs.existsSync(DATA_FILE)) return [];
     const data = fs.readFileSync(DATA_FILE, "utf8");
     return data ? JSON.parse(data) : [];
   } catch (err) {
@@ -33,31 +31,36 @@ const writeData = (data) => {
   }
 };
 
+// --- Routes ---
+
+// Home page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views/home.html"));
 });
 
-// GET
+// Earnings page
+app.get("/earnings", (req, res) => {
+  res.sendFile(path.join(__dirname, "views/earnings.html"));
+});
+
+// GET all products
 app.get("/api/items", (req, res) => {
   const products = readData();
   res.json(products);
 });
 
-// POST
+// POST a new product
 app.post("/api/items", (req, res) => {
   const products = readData();
   const userInput = req.body;
 
-  // form validation
   if (!userInput.name || !userInput.price) {
     return res.status(400).json({ error: "Name and Price are required" });
   }
 
-  // auto generate id: last id + 1
   let newId = 1;
   if (products.length > 0) {
-    const lastItem = products[products.length - 1];
-    newId = lastItem.product_id + 1;
+    newId = products[products.length - 1].product_id + 1;
   }
 
   const newItem = {
@@ -72,25 +75,27 @@ app.post("/api/items", (req, res) => {
   res.status(201).json(newItem);
 });
 
-// start server
+// --- GET sales for earnings page ---
+app.get("/api/sales", (req, res) => {
+  const products = readData();
+
+  // Generate random quantity sold for testing
+  const sales = products.map((p) => {
+    const quantity = Math.floor(Math.random() * 21); // 0-20
+    return {
+      item: p.name,
+      price: p.price,
+      quantity,
+      total: +(p.price * quantity).toFixed(2),
+    };
+  });
+
+  res.json(sales);
+});
+
+// --- Start server ---
 app.listen(PORT, () => {
   console.log(`Server started on port: ${PORT}`);
   console.log(`__dirname: ${__dirname}`);
   console.log(`Looking for data at: ${DATA_FILE}`);
-});
-
-app.get("/earnings", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "earnings.html"));
-});
-
-// TEMP sales data for earnings page
-app.get("/api/sales", (req, res) => {
-  res.json([
-    { item: "Keyboard", price: 50 },
-    { item: "Mouse", price: 25 }
-  ]);
-});
-
-app.listen(PORT, () => {
-  console.log("Server started on port: " + PORT);
 });

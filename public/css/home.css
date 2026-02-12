@@ -586,3 +586,32 @@ body {
         transform: translateY(0);
     }
 }
+
+
+.earnings-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; 
+  margin-top: 10px;
+}
+
+.earnings-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.earnings-table th,
+.earnings-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap; 
+}
+
+.earnings-table th {
+  background-color: #f4f4f4;
+  position: sticky;
+  top: 0; 
+  z-index: 1;
+}
