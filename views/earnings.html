@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earnings Report - TechPOS</title>
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="js/earnings.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon"><i data-lucide="store"></i></div>
+      <div>
+        <h2>TechPOS</h2>
+        <span class="subtitle">User #01</span>
+      </div>
+    </div>
+
+    <nav class="categories">
+      <h3>CATEGORIES</h3>
+      <ul id="category-list">
+        <li onclick="window.location.href='/'"><i data-lucide="layout-grid"></i> Home</li>
+        <li class="active"><i data-lucide="dollar-sign"></i> Earnings</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="header-left">
+        <h1 id="page-title">Earnings Report</h1>
+        <span class="tag" id="total-revenue">$0.00 Total Revenue</span>
+      </div>
+      <div class="header-right">
+        <span id="clock">12:00 PM</span>
+      </div>
+    </header>
+
+    <!-- Table wrapper for horizontal scrolling -->
+    <div class="earnings-table-wrapper">
+      <table class="earnings-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Units Sold</th>
+            <th>Price ($)</th>
+            <th>Total ($)</th>
+          </tr>
+        </thead>
+        <tbody id="earnings-body">
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
+
