@@ -1,240 +1,287 @@
-/* --- STATE MANAGEMENT --- */
-let db = []; // Will be populated from JSON
+let allProducts = [];
 let cart = [];
-let currentCategory = 'all';
+const TAX_RATE = 0.13;
 
-/* --- DOM ELEMENTS --- */
-const productGrid = document.getElementById('productGrid');
-const cartItemsContainer = document.getElementById('cartItemsContainer');
-const subTotalEl = document.getElementById('subTotalDisplay');
-const taxEl = document.getElementById('taxDisplay');
-const totalEl = document.getElementById('totalDisplay');
-const payBtnText = document.getElementById('payButtonText');
-const cartCountBadge = document.getElementById('cartCount');
-const searchInput = document.getElementById('searchInput');
-
-/* --- INITIALIZATION --- */
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Fetch Data
-    fetchProducts();
-    
-    // 2. Start Clock
-    startClock();
-    
-    // 3. Set Date
-    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-    document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', options);
-
-    // 4. Initialize Static Icons
-    lucide.createIcons();
+document.addEventListener("DOMContentLoaded", () => {
+  fetchItems();
+  updateClock();
+  lucide.createIcons();
 });
 
-async function fetchProducts() {
-    try {
-        const response = await fetch('/data/products.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        db = await response.json();
-        
-        // Initialize App with Data
-        updateCategoryCounts();
-        renderProducts(db);
-        renderCart();
-        
-    } catch (error) {
-        console.error("Could not fetch products:", error);
-        productGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:red;">Error loading products. Please ensure a local server is running.</div>`;
-    }
+// GET
+async function fetchItems() {
+  try {
+    const res = await fetch("/api/items");
+    if (!res.ok) throw new Error("Failed to load");
+    allProducts = await res.json();
+
+    renderProducts(allProducts);
+    const countSpan = document.getElementById("total-count");
+    if (countSpan) countSpan.innerText = `${allProducts.length} items`;
+  } catch (err) {
+    console.error("Error fetching items:", err);
+  }
 }
 
-function renderProducts(productsToRender) {
-    productGrid.innerHTML = '';
-    
-    if (productsToRender.length === 0) {
-        productGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#9ca3af;">No products found.</div>`;
-        return;
-    }
+// POST
+async function addNewProduct(event) {
+  event.preventDefault();
 
-    productsToRender.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        const colorClass = getBrandColor(product.brand);
-        const initial = product.brand ? product.brand.substring(0, 2).toUpperCase() : '??';
+  const name = document.getElementById("new-name").value;
+  const brand = document.getElementById("new-brand").value;
+  const category = document.getElementById("new-category").value;
+  const storage = document.getElementById("new-storage").value;
+  const color = document.getElementById("new-color").value;
+  const price = parseFloat(document.getElementById("new-price").value);
+  const stock = parseInt(document.getElementById("new-stock").value);
+  const desc = document.getElementById("new-desc").value;
+
+  // auto generate SKU
+  // brand: first 3 letters
+  const skuBrand = brand.substring(0, 3).toUpperCase();
+
+  // model: last word of the name
+  const nameParts = name.split(" ");
+  const skuModel =
+    nameParts.length > 0
+      ? nameParts[nameParts.length - 1].toUpperCase()
+      : "GEN";
+
+  // color: first 2 letters and last letter
+  let skuColor = "STD";
+  if (color.length >= 3) {
+    skuColor = (color.substring(0, 2) + color.slice(-1)).toUpperCase();
+  } else if (color.length > 0) {
+    skuColor = color.toUpperCase();
+  }
+
+  // storage: extract numbers
+  const storageMatch = storage.match(/\d+/);
+  const skuStorage = storageMatch ? storageMatch[0] : null;
+
+  let generatedSku;
+  if (skuStorage) {
+    generatedSku = `${skuBrand}-${skuModel}-${skuStorage}-${skuColor}`;
+  } else {
+    generatedSku = `${skuBrand}-${skuModel}-${skuColor}`;
+  }
+
+  // create object
+  const newItem = {
+    sku: generatedSku,
+    name: name,
+    brand: brand,
+    category: category,
+    storage: storage || null,
+    color: color || "Standard",
+    price: price,
+    stock_quantity: stock,
+    description: desc || `${brand} ${name}`,
+  };
+
+  // send POST request
+  try {
+    const res = await fetch("/api/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newItem),
+    });
+
+    if (res.ok) {
+      toggleModal();
+      fetchItems();
+      document.querySelector("form").reset();
+      alert(`Item Added! SKU: ${generatedSku}`);
+    } else {
+      alert("Error adding item");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to connect to server");
+  }
+
+  renderCart(); // to update UI
+}
+
+// logic
+
+function renderProducts(products) {
+    const container = document.getElementById("product-container");
+    if (!container) return;
+    
+    container.innerHTML = "";
+
+    products.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "card"; 
+        
+        card.onclick = () => addToCart(item);
 
         card.innerHTML = `
-            <div class="card-img-placeholder ${colorClass}">
-                ${initial}
-            </div>
-            <div class="card-brand">${product.brand}</div>
-            <div class="card-title">${product.name}</div>
-            <div class="card-code">${product.sku}</div>
-            <div class="card-footer">
-                <div class="price">$${product.price.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                <div class="stock-badge">${product.stock_quantity} in stock</div>
-            </div>
-        `;
-        
-        card.onclick = () => addToCart(product);
-        productGrid.appendChild(card);
-    });
-
-    // Update the header count
-    document.getElementById('totalItemCount').textContent = `${productsToRender.length} items`;
-}
-
-function renderCart() {
-    cartItemsContainer.innerHTML = '';
-    
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = `<div class="empty-state">Cart is empty</div>`;
-        updateTotals(0);
-        return;
-    }
-
-    let subtotal = 0;
-
-    cart.forEach(item => {
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <div class="item-info">
-                <h4>${item.name}</h4>
-                <p>$${item.price.toFixed(2)} x ${item.qty}</p>
-            </div>
-            <div class="item-right">
-                <div class="qty-control">
-                    <div class="qty-btn" onclick="updateQty(${item.product_id}, -1)">-</div>
-                    <div class="qty-val">${item.qty}</div>
-                    <div class="qty-btn" onclick="updateQty(${item.product_id}, 1)">+</div>
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteProduct(${item.product_id})">
+                <i data-lucide="trash"></i>
+            </button>
+            
+            <div class="card-content">
+                <div class="card-icon">
+                    <i data-lucide="${getIconByCategory(item.category)}"></i>
                 </div>
-                <div class="item-total">$${itemTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                <i data-lucide="trash-2" class="trash-icon" onclick="removeFromCart(${item.product_id})"></i>
+                <div class="card-info">
+                    <span class="brand">${item.brand}</span>
+                    <h3 class="title">${item.name}</h3>
+                    <span class="sku">${item.sku || 'SKU-000'}</span>
+                </div>
+                <div class="card-footer">
+                    <span class="price">$${item.price.toFixed(2)}</span>
+                    <span class="stock-badge">${item.stock_quantity} Left</span>
+                </div>
             </div>
         `;
-        cartItemsContainer.appendChild(cartItem);
+        container.appendChild(card);
     });
 
-    updateTotals(subtotal);
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
 }
 
-function addToCart(product) {
-    const existingItem = cart.find(item => item.product_id === product.product_id);
-    if (existingItem) {
-        existingItem.qty++;
-    } else {
-        cart.push({ ...product, qty: 1 });
-    }
-    renderCart();
+// helper to pick icons
+function getIconByCategory(cat) {
+    const map = {
+        'Laptops': 'laptop', 'Smartphones': 'tablet-smartphone', 'Tablets': 'tablet',
+        'Accessories': 'keyboard', 'E-Readers': 'book-check', 'Storage': 'hard-drive',
+        'Audio': 'headphones', 'Gaming': 'gamepad-2', 'Cameras': 'camera',
+        'Wearables': 'watch', 'Monitors': 'monitor',
+        'Smart Home': 'house', 'Networking': 'router', 'Drones': 'drone'
+    };
+    return map[cat] || 'box'; 
 }
 
-function updateQty(productId, change) {
-    const item = cart.find(i => i.product_id === productId);
-    if (!item) return;
-    item.qty += change;
-    if (item.qty <= 0) removeFromCart(productId);
-    else renderCart();
-}
-
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.product_id !== productId);
-    renderCart();
-}
-
-function clearCart() {
-    if(cart.length > 0 && confirm("Are you sure you want to clear the order?")) {
-        cart = [];
-        renderCart();
-    }
-}
-
-function updateTotals(subtotal) {
-    const taxRate = 0.08;
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
-
-    subTotalEl.innerText = `$${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-    taxEl.innerText = `$${tax.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-    totalEl.innerText = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-    payBtnText.innerText = `Pay $${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+// logic for sidebar
+function filterCategory(category) {
+    document.querySelectorAll('.categories li').forEach(li => li.classList.remove('active'));
     
-    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartCountBadge.innerText = totalItems;
-}
+    // find  clicked category and add 'active'
+    // we look for <li> that has this specific category in its onclick attribute
+    const activeItem = Array.from(document.querySelectorAll('.categories li')).find(li => 
+        li.getAttribute('onclick').includes(`'${category}'`) || 
+        (category === 'all' && li.getAttribute('onclick').includes("'all'"))
+    );
+    if (activeItem) activeItem.classList.add('active');
 
-function processPayment() {
-    if (cart.length === 0) {
-        alert("Cart is empty!");
-        return;
-    }
-    alert(`Payment Successful!\nTotal: ${totalEl.innerText}`);
-    cart = [];
-    renderCart();
-}
+    const title = document.getElementById("page-title");
+    const countLabel = document.getElementById("total-count"); // get the count element
 
-/* --- FILTER & SEARCH --- */
-function filterCategory(category, element) {
-    currentCategory = category;
-    
-    // Reset active class
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    // Set new active class (handle null if called programmatically)
-    if(element) element.classList.add('active');
-
-    if (category === 'all') {
-        renderProducts(db);
-        document.getElementById('pageTitle').innerHTML = `All Items <span class="item-count">${db.length} items</span>`;
+    if (category === 'all' || category === 'All') {
+        renderProducts(allProducts);
+        if (title) title.innerText = "All Items";
+        if (countLabel) countLabel.innerText = allProducts.length + " items"; 
+        
     } else {
-        const filtered = db.filter(p => p.category === category);
+        const filtered = allProducts.filter(p => p.category === category);
         renderProducts(filtered);
-        document.getElementById('pageTitle').innerHTML = `${category} <span class="item-count">${filtered.length} items</span>`;
+        if (title) title.innerText = category;
+        if (countLabel) countLabel.innerText = filtered.length + " items"; 
     }
 }
 
 function searchProducts() {
-    const term = searchInput.value.toLowerCase();
-    const filtered = db.filter(p => 
-        (p.name.toLowerCase().includes(term) || p.sku.toLowerCase().includes(term)) &&
-        (currentCategory === 'all' || p.category === currentCategory)
+    const query = document.getElementById("search-input").value.toLowerCase();
+    const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.brand.toLowerCase().includes(query)
     );
     renderProducts(filtered);
 }
 
-/* --- UTILITIES --- */
-function updateCategoryCounts() {
-    const counts = {};
-    db.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
-    
-    // Safe update for elements that might not exist in your HTML
-    const setSafeText = (id, text) => {
-        const el = document.getElementById(id);
-        if(el) el.innerText = text;
-    };
+// cart logic
 
-    setSafeText('count-all', db.length);
-    setSafeText('count-Laptops', counts['Laptops'] || 0);
-    setSafeText('count-Smartphones', counts['Smartphones'] || 0);
-    setSafeText('count-Tablets', counts['Tablets'] || 0);
-    setSafeText('count-Audio', counts['Audio'] || 0);
-    setSafeText('count-Accessories', counts['Accessories'] || 0);
+function addToCart(product) {
+  const existingItem = cart.find(
+    (item) => item.product_id === product.product_id,
+  );
+
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+  renderCart();
 }
 
-function getBrandColor(brand) {
-    if (!brand) return 'ph-orange';
-    const b = brand.toLowerCase();
-    if (['apple', 'samsung', 'dell'].includes(b)) return 'ph-blue';
-    if (['sony', 'logitech'].includes(b)) return 'ph-purple';
-    return 'ph-orange';
+function renderCart() {
+    const container = document.getElementById("cart-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="text-align:center; padding:40px; color:#aaa;">
+                <div style="margin-bottom:10px;"><i data-lucide="shopping-cart" size="40"></i></div>
+                <p>No items in order</p>
+            </div>`;
+        updateTotals();
+        if (window.lucide) lucide.createIcons();
+        return;
+    }
+
+    cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+            <div class="item-details">
+                <strong>${item.name}</strong>
+                <div class="item-math">${item.quantity} x $${item.price.toFixed(2)}</div>
+            </div>
+            <div class="item-right">
+                <span class="item-total">$${(item.price * item.quantity).toFixed(2)}</span>
+                <button onclick="removeFromCart(${index})" class="remove-btn">
+                    <i data-lucide="x" size="16"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    updateTotals();
+    if (window.lucide) lucide.createIcons();
 }
 
-function startClock() {
-    setInterval(() => {
-        const now = new Date();
-        const clockText = document.getElementById('clock-text');
-        if(clockText) clockText.innerText = now.toLocaleTimeString();
-    }, 1000);
+function updateTotals() {
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const tax = subtotal * TAX_RATE;
+  const total = subtotal + tax;
+
+  document.getElementById("subtotal-price").innerText =
+    `$${subtotal.toFixed(2)}`;
+  document.getElementById("tax-price").innerText = `$${tax.toFixed(2)}`;
+  document.getElementById("total-price").innerText = `$${total.toFixed(2)}`;
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+function clearCart() {
+  cart = [];
+  renderCart();
+}
+
+// utils
+
+function toggleModal() {
+    const modal = document.getElementById("add-item-modal");
+    if(modal) modal.classList.toggle("hidden");
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").innerText = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  setTimeout(updateClock, 1000);
 }
