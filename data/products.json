@@ -132,18 +132,6 @@
     "description": "8-inch premium Kobo eReader"
   },
   {
-    "product_id": 13,
-    "sku": "APL-AIRPODSPRO2-WHT",
-    "name": "AirPods Pro (2nd Generation)",
-    "brand": "Apple",
-    "category": "Audio",
-    "storage": null,
-    "color": "White",
-    "price": 329.99,
-    "stock_quantity": 35,
-    "description": "Noise-cancelling wireless earbuds"
-  },
-  {
     "product_id": 14,
     "sku": "SNY-WH1000XM5-BLK",
     "name": "Sony WH-1000XM5",
