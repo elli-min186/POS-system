@@ -43,6 +43,12 @@ app.get("/earnings", (req, res) => {
   res.sendFile(path.join(__dirname, "views/earnings.html"));
 });
 
+// Inventory page
+app.get("/inventory", (req, res) => {
+  res.sendFile(path.join(__dirname, "views/inventory.html"));
+});
+
+
 // GET all products
 app.get("/api/items", (req, res) => {
   const products = readData();
