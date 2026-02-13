@@ -574,5 +574,17 @@
     "price": 219.99,
     "stock_quantity": 14,
     "description": "Mechanical RGB gaming keyboard"
+  },
+  {
+    "product_id": 51,
+    "sku": "SAM-LITE-128-SIR",
+    "name": "Tab S10 Lite",
+    "brand": "Samsung",
+    "category": "Tablets",
+    "storage": "128GB",
+    "color": "Silver",
+    "price": 379.99,
+    "stock_quantity": 10,
+    "description": "Budget-friendly tablet w/ S-pen"
   }
 ]
