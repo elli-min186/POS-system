@@ -1,5 +1,17 @@
 [
   {
+    "product_id": 1,
+    "sku": "APL-IP15PRO-128-BLK",
+    "name": "iPhone 15 Pro",
+    "brand": "Apple",
+    "category": "Smartphones",
+    "storage": "128GB",
+    "color": "Black",
+    "price": 1499.99,
+    "stock_quantity": 10,
+    "description": "iPhone 15 Pro 128GB Black"
+  },
+  {
     "product_id": 2,
     "sku": "APL-IP15PRO-256-NAT",
     "name": "iPhone 15 Pro",
