@@ -2,38 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Inventory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory - TechPOS</title>
+
+  <!-- Shared Layout Styles -->
+  <link rel="stylesheet" href="/css/home.css">
+
+  <!-- Inventory Page Styles -->
   <link rel="stylesheet" href="/css/inventory.css">
 
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <link rel="stylesheet" href="/css/inventory.css">
-<script src="/js/inventory.js" defer></script>
-
+  <!-- Script -->
+  <script src="/js/inventory.js" defer></script>
 </head>
 
 <body>
-<div class="inventory-container">
 
-<div class="inventory-header">
-    <h1>Inventory Management</h1>
+<div class="container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon"><i data-lucide="store"></i></div>
+      <div>
+        <h2>TechPOS</h2>
+        <span class="subtitle">User #01</span>
+      </div>
+    </div>
+
+    <nav class="categories">
+      <h3>CATEGORIES</h3>
+      <ul>
+        <li onclick="window.location.href='/'">
+          <i data-lucide="layout-grid"></i> Home
+        </li>
+        <li onclick="window.location.href='/earnings'">
+          <i data-lucide="dollar-sign"></i> Earnings
+        </li>
+        <li class="active">
+          <i data-lucide="boxes"></i> Inventory
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <header class="top-bar">
+      <div class="header-left">
+        <h1>Inventory Management</h1>
+        <span class="tag">Manage Products & Stock</span>
+      </div>
+      <div class="header-right">
+        <span id="clock">12:00 PM</span>
+      </div>
+    </header>
+
+    <div class="inventory-table-wrapper">
+      <table class="inventory-table" id="inventoryTable">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price ($)</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS Will Populate -->
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
 </div>
 
-<div class="table-wrapper">
-
-
-  <h1>📦 Inventory Management</h1>
-
-  <table id="inventoryTable" border="1">
-    <tr>
-      <th>Name</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Action</th>
-    </tr>
-  </table>
-</div>
-</div>
-</body>
+<script>
+  lucide.createIcons();
+</script>
 
 </body>
 </html>

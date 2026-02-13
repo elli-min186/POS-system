@@ -5,15 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Earnings Report - TechPOS</title>
 
- 
   <link rel="stylesheet" href="/css/home.css">
-
-
   <link rel="stylesheet" href="/css/earnings.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/lucide@latest"></script>
-
 
   <script defer src="/js/earnings.js"></script>
 </head>
@@ -35,8 +31,13 @@
         <li onclick="window.location.href='/'">
           <i data-lucide="layout-grid"></i> Home
         </li>
+
         <li class="active">
           <i data-lucide="dollar-sign"></i> Earnings
+        </li>
+
+        <li onclick="window.location.href='/inventory'">
+          <i data-lucide="boxes"></i> Inventory
         </li>
       </ul>
     </nav>
@@ -64,14 +65,12 @@
             <th>Total ($)</th>
           </tr>
         </thead>
-        <tbody id="earnings-body">
-        </tbody>
+        <tbody id="earnings-body"></tbody>
       </table>
     </div>
   </main>
 </div>
 
-<!-- Initialize Lucide Icons -->
 <script>
   lucide.createIcons();
 </script>
