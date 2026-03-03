@@ -25,6 +25,12 @@ The application demonstrates as the marking rubric requires:
 - To start the frontend: ```cd frontend``` & ```npm run dev```
     - To run in browser: http://localhost:8080
 
+- To install MongoDB in Mac: ```brew install mongodb-community``` 
+- To run MongoDB in Mac: ```brew services start mongodb/brew/mongodb-community```
+- To stop MongoBD in Mac: ```brew services stop mongodb/brew/mongodb-community```
+
+- To install mongoose in backend: ```npm install mongoose```
+
 ## Route
 document routes:
 - /            (Home)

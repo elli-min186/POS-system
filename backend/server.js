@@ -1,13 +1,32 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const cors = require("cors");
+const { default: mongoose } = require("mongoose");
 const path = require("path");
 const fs = require("fs");
+const Products = require("./models/Products");
 
 const app = express();
-const PORT = 8080;
+const PORT          = 8080;
+const DATABASE_HOST = "localhost";
+const DATABASE_PORT = 27017;
+const DATABASE_NAME = "pos-system";
 
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+//Enable CORS for frontend requests
+app.use(cors());
+app.use(express.json());
+
+//database connect
+const dbURL = `mongodb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
+mongoose.connect(dbURL);
+
+const db = mongoose.connection;
+db.on("error", function(e) {
+    console.log("error connecting" + e);
+});
+db.on("open", function() {
+    console.log("database connected!");
+});
+
 
 const DATA_FILE = path.join(__dirname, "data", "products.json");
 
@@ -31,7 +50,7 @@ const writeData = (data) => {
   }
 };
 
-// --- Routes ---
+// --- Routes for frontend ---
 
 // Home page
 app.get("/", (req, res) => {
