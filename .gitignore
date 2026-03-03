@@ -1,1 +1,7 @@
 node_modules
+.env
+dist/
+dist-ssr/
+
+# OS junk files
+.DS_Store
