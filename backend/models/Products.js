@@ -50,7 +50,7 @@ const ProductsSchema = new mongoose.Schema({
     type: String,
     required: false,
     unique: false
-  },
+  }
 });
 
 const Products = mongoose.model("products", ProductsSchema);

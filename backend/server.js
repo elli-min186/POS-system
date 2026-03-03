@@ -6,7 +6,7 @@ const fs = require("fs");
 const Products = require("./models/Products");
 
 const app = express();
-const PORT          = 8080;
+const PORT = 8080;
 const DATABASE_HOST = "localhost";
 const DATABASE_PORT = 27017;
 const DATABASE_NAME = "pos-system";
@@ -20,13 +20,12 @@ const dbURL = `mongodb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
 mongoose.connect(dbURL);
 
 const db = mongoose.connection;
-db.on("error", function(e) {
-    console.log("error connecting" + e);
+db.on("error", function (e) {
+  console.log("error connecting" + e);
 });
-db.on("open", function() {
-    console.log("database connected!");
+db.on("open", function () {
+  console.log("database connected!");
 });
-
 
 const DATA_FILE = path.join(__dirname, "data", "products.json");
 
@@ -67,7 +66,6 @@ app.get("/inventory", (req, res) => {
   res.sendFile(path.join(__dirname, "views/inventory.html"));
 });
 
-
 // GET all products
 app.get("/api/items", (req, res) => {
   const products = readData();
@@ -75,41 +73,41 @@ app.get("/api/items", (req, res) => {
 });
 
 // POST a new product
-app.post("/api/items", (req, res) => {
-  const products = readData();
-  const userInput = req.body;
+app.post("/api/items", async (req, res) => {
+  try {
+    const userInput = req.body;
 
-  if (!userInput.name || !userInput.price) {
-    return res.status(400).json({ error: "Name and Price are required" });
+    if (!userInput.name || !userInput.price) {
+      return res.status(400).json({ error: "Name and Price are required" });
+    }
+
+    // auto increment logic for product_id
+    // product_id: -1 for sort gets highest id first
+    const lastProduct = await Products.findOne().sort({ product_id: -1 });
+    const newId = lastProduct ? lastProduct.product_id + 1 : 1;
+
+    const newItem = new Products({
+      product_id: newId,
+      ...userInput,
+    });
+
+    await newItem.save();
+    
+    console.log(`Added Item: ${newItem.name} (ID: ${newId})`);
+    res.status(201).json(newItem);
+
+  } catch (error) {
+    res.status(400).json({ error: "Failed to create item", details: error.message });
   }
-
-  let newId = 1;
-  if (products.length > 0) {
-    newId = products[products.length - 1].product_id + 1;
-  }
-
-  const newItem = {
-    product_id: newId,
-    ...userInput,
-  };
-
-  products.push(newItem);
-  writeData(products);
-
-  console.log(`Added Item: ${newItem.name} (ID: ${newId})`);
-  res.status(201).json(newItem);
 });
 
 // DELETE a product by ID
 app.delete("/api/items/:id", (req, res) => {
-
   const products = readData();
 
   const id = parseInt(req.params.id);
 
-  const newProducts = products.filter(
-    (item) => item.product_id !== id
-  );
+  const newProducts = products.filter((item) => item.product_id !== id);
 
   if (newProducts.length === products.length) {
     return res.status(404).json({ error: "Item not found" });
@@ -121,7 +119,6 @@ app.delete("/api/items/:id", (req, res) => {
 
   res.status(200).json({ message: "Item deleted" });
 });
-
 
 // --- GET sales for earnings page ---
 app.get("/api/sales", (req, res) => {
