@@ -159,7 +159,7 @@ app.put("/api/items/:id", async (req, res) => {
     const updatedItem = await Products.findOneAndUpdate(
       { product_id: productId },
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!updatedItem) {
