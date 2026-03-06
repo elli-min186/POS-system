@@ -1,39 +1,118 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "../css/home.css";
+import "../css/earnings.css";
+import Sidebar from "../components/Sidebar";
 
 function Earnings() {
+  const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
+  const [time, setTime] = useState("");
 
   useEffect(() => {
+    fetch("http://localhost:8080/api/items")
+      .then((res) => res.json())
+      .then((data) => setProducts(Array.isArray(data) ? data : []))
+      .catch((err) => console.error("Error fetching products:", err));
+
     fetch("http://localhost:8080/api/sales")
       .then((res) => res.json())
-      .then((data) => setSales(data))
+      .then((data) => setSales(Array.isArray(data) ? data : []))
       .catch((err) => console.error("Error fetching sales:", err));
   }, []);
 
-  return (
-    <div>
-      <h1>Earnings Page</h1>
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setTime(
+        now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    };
 
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sales.map((sale, index) => (
-            <tr key={index}>
-              <td>{sale.item}</td>
-              <td>${sale.price}</td>
-              <td>{sale.quantity}</td>
-              <td>${sale.total}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const earningsRows = useMemo(() => {
+    return products.map((product) => {
+      const sale = sales.find((s) => s.item === product.name) || { quantity: 0 };
+      const unitsSold = sale.quantity || 0;
+      const revenue = +(unitsSold * Number(product.price)).toFixed(2);
+
+      return {
+        id: product.product_id ?? product._id,
+        name: product.name,
+        sku: product.sku || "N/A",
+        unitsSold,
+        price: Number(product.price),
+        total: revenue,
+      };
+    });
+  }, [products, sales]);
+
+  const totalRevenue = useMemo(() => {
+    return earningsRows.reduce((sum, row) => sum + row.total, 0);
+  }, [earningsRows]);
+
+  return (
+    <div className="container">
+      <Sidebar
+        time={time}
+        showCategories={false}
+        activePage="earnings"
+      />
+
+      <main className="main-content">
+        <header className="top-bar">
+          <div className="header-left">
+            <h1 id="page-title">Earnings Report</h1>
+            <span className="tag" id="total-revenue">
+              ${totalRevenue.toFixed(2)} Total Revenue
+            </span>
+          </div>
+
+          <div className="header-right">
+            <span>{time}</span>
+          </div>
+        </header>
+
+        <div className="earnings-table-wrapper">
+          <table className="earnings-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Units Sold</th>
+                <th>Price ($)</th>
+                <th>Total ($)</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {earningsRows.map((row) => (
+                <tr key={row.id}>
+                  <td>{row.name}</td>
+                  <td>{row.sku}</td>
+                  <td>{row.unitsSold}</td>
+                  <td>${row.price.toFixed(2)}</td>
+                  <td>${row.total.toFixed(2)}</td>
+                </tr>
+              ))}
+
+              {earningsRows.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="empty-earnings">
+                    No earnings data available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   );
 }

@@ -14,11 +14,11 @@ import {
   HardDrive,
   House,
   Router,
-  Drone,
-  ShoppingCart
+  Drone
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import "../home.css";
+import Sidebar from "../components/Sidebar";
+import "../css/home.css";
 
 function Home() {
   const TAX_RATE = 0.13;
@@ -238,37 +238,14 @@ function Home() {
 
   return (
     <div className="container">
-      <aside className="sidebar">
-        <div>
-          <div className="logo-area">
-            <div className="logo-icon">
-              <ShoppingCart size={20} />
-            </div>
-
-            <div>
-              <h2>TechPOS</h2>
-              <span className="subtitle">{time}</span>
-            </div>
-          </div>
-
-          <nav className="categories">
-            <h3>CATEGORIES</h3>
-
-            <ul>
-              {categories.map((cat) => (
-                <li
-                  key={cat.name}
-                  className={selectedCategory === cat.name ? "active" : ""}
-                  onClick={() => filterCategory(cat.name)}
-                >
-                  {cat.icon}
-                  {cat.label || cat.name}
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </aside>
+      <Sidebar
+        time={time}
+        showCategories={true}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={filterCategory}
+        activePage="home"
+      />
 
       <main className="main-content">
         <header className="top-bar">
@@ -276,7 +253,6 @@ function Home() {
             <h1>
               {selectedCategory === "all" ? "All Items" : selectedCategory}
             </h1>
-
             <span className="tag">{filteredProducts.length} items</span>
           </div>
 
@@ -308,7 +284,6 @@ function Home() {
       <aside className="order-panel">
         <div className="order-header">
           <h3>Current Order</h3>
-
           <button className="clear-cart-btn" onClick={clearCart}>
             Clear
           </button>
@@ -317,10 +292,7 @@ function Home() {
         <div className="order-list">
           {cart.length === 0 ? (
             <div className="empty-state">
-              <div className="icon-circle">
-                <ShoppingCart size={28} />
-              </div>
-
+              <div className="icon-circle">🛒</div>
               <p>No items in order</p>
               <small>Tap products to add them here</small>
             </div>
@@ -329,7 +301,6 @@ function Home() {
               <div key={index} className="cart-item">
                 <div className="item-details">
                   <strong>{item.name}</strong>
-
                   <div className="item-math">
                     {item.quantity} x ${item.price.toFixed(2)}
                   </div>
@@ -382,7 +353,6 @@ function Home() {
           <div className="modal-content" style={{ width: "500px" }}>
             <div className="modal-header">
               <h3>Add New Product</h3>
-
               <span
                 className="close-modal"
                 onClick={() => setShowModal(false)}
