@@ -1,8 +1,8 @@
 import { Trash2 } from "lucide-react";
 
-function InventoryCard({ item, onDelete }) {
+function InventoryCard({ item, onDelete, onClick }) {
   return (
-    <div className="card">
+    <div className="card" onClick={onClick}>
       <button
         className="delete-btn"
         style={{ opacity: 1, transform: "scale(1)" }}

@@ -701,6 +701,40 @@ body {
     background: #dc2626;
 }
 
+.inventory-detail-panel {
+    background: var(--white);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.inventory-detail-header {
+    margin-bottom: 20px;
+}
+
+.inventory-detail-header h3 {
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.inventory-detail-header p {
+    color: var(--text-grey);
+    font-size: 0.9rem;
+}
+
+.inventory-empty {
+    text-align: center;
+    color: var(--text-grey);
+    margin-top: 80px;
+}
+
+.inventory-save-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
 @keyframes popup {
     from {
         transform: scale(0.95);

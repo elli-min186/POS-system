@@ -30,6 +30,18 @@ function Inventory() {
   const [showModal, setShowModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    brand: "",
+    category: "",
+    storage: "",
+    color: "",
+    price: "",
+    stock_quantity: "",
+    description: ""
+  });
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     brand: "",
@@ -67,7 +79,8 @@ function Inventory() {
     fetch("http://localhost:8080/api/items")
       .then((res) => res.json())
       .then((data) => {
-        setItems(Array.isArray(data) ? data : []);
+        const safeItems = Array.isArray(data) ? data : [];
+        setItems(safeItems);
         setLoading(false);
       })
       .catch((err) => {
@@ -108,6 +121,20 @@ function Inventory() {
     return matchesCategory && matchesSearch;
   });
 
+  const handleSelectItem = (item) => {
+    setSelectedItem(item);
+    setEditForm({
+      name: item.name || "",
+      brand: item.brand || "",
+      category: item.category || "",
+      storage: item.storage || "",
+      color: item.color || "",
+      price: item.price ?? "",
+      stock_quantity: item.stock_quantity ?? "",
+      description: item.description || ""
+    });
+  };
+
   const confirmDeleteItem = async (id) => {
     try {
       const response = await fetch(`http://localhost:8080/api/items/${id}`, {
@@ -121,6 +148,21 @@ function Inventory() {
       }
 
       setItems((prev) => prev.filter((item) => item.product_id !== id));
+
+      if (selectedItem && selectedItem.product_id === id) {
+        setSelectedItem(null);
+        setEditForm({
+          name: "",
+          brand: "",
+          category: "",
+          storage: "",
+          color: "",
+          price: "",
+          stock_quantity: "",
+          description: ""
+        });
+      }
+
       setItemToDelete(null);
     } catch (err) {
       console.error("Error deleting item:", err);
@@ -131,6 +173,13 @@ function Inventory() {
   const handleChange = (e) => {
     setNewProduct({
       ...newProduct,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleEditChange = (e) => {
+    setEditForm({
+      ...editForm,
       [e.target.name]: e.target.value
     });
   };
@@ -222,6 +271,56 @@ function Inventory() {
     }
   };
 
+  const updateItem = async () => {
+    if (!selectedItem) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/items/${selectedItem.product_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            ...editForm,
+            price: Number(editForm.price),
+            stock_quantity: Number(editForm.stock_quantity)
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update item");
+      }
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.product_id === selectedItem.product_id ? data : item
+        )
+      );
+
+      setSelectedItem(data);
+      setEditForm({
+        name: data.name || "",
+        brand: data.brand || "",
+        category: data.category || "",
+        storage: data.storage || "",
+        color: data.color || "",
+        price: data.price ?? "",
+        stock_quantity: data.stock_quantity ?? "",
+        description: data.description || ""
+      });
+
+      alert("Item updated successfully");
+    } catch (error) {
+      console.error("Update error:", error);
+      alert(error.message || "Failed to update item");
+    }
+  };
+
   return (
     <div className="container">
       <Sidebar
@@ -269,12 +368,140 @@ function Inventory() {
               <InventoryCard
                 key={item.product_id}
                 item={item}
+                onClick={() => handleSelectItem(item)}
                 onDelete={(id, name) => setItemToDelete({ id, name })}
               />
             ))}
           </div>
         )}
       </main>
+
+      <aside className="order-panel">
+        {selectedItem ? (
+          <>
+            <div className="order-header">
+              <h3>Edit Product</h3>
+            </div>
+
+            <div className="order-list">
+              <div className="form-group">
+                <label>Product Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editForm.name}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Brand</label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={editForm.brand}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Category</label>
+                <select
+                  name="category"
+                  value={editForm.category}
+                  onChange={handleEditChange}
+                >
+                  {inventoryCategories.map((cat) => (
+                    <option key={cat.name} value={cat.name}>
+                      {cat.label || cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Storage</label>
+                <input
+                  type="text"
+                  name="storage"
+                  value={editForm.storage}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Color</label>
+                <input
+                  type="text"
+                  name="color"
+                  value={editForm.color}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Price ($)</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={editForm.price}
+                  onChange={handleEditChange}
+                  step="0.01"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Quantity</label>
+                <input
+                  type="number"
+                  name="stock_quantity"
+                  value={editForm.stock_quantity}
+                  onChange={handleEditChange}
+                  min="0"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>SKU</label>
+                <input type="text" value={selectedItem.sku || ""} disabled />
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={editForm.description}
+                  onChange={handleEditChange}
+                  rows="4"
+                />
+              </div>
+            </div>
+
+            <div className="order-total-section">
+              <button
+                className="checkout-btn"
+                type="button"
+                onClick={updateItem}
+              >
+                Save Changes
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="order-header">
+              <h3>Product Details</h3>
+            </div>
+
+            <div className="order-list">
+              <div className="empty-state">
+                <p>Select a product card</p>
+                <small>View and edit product details here</small>
+              </div>
+            </div>
+          </>
+        )}
+      </aside>
 
       {showModal && (
         <div className="modal">
