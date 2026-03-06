@@ -31,19 +31,6 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [time, setTime] = useState("");
 
-  const [showModal, setShowModal] = useState(false);
-
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    brand: "",
-    category: "Smartphones",
-    storage: "",
-    color: "",
-    price: "",
-    stock_quantity: "10",
-    description: ""
-  });
-
   useEffect(() => {
     fetch("http://localhost:8080/api/items")
       .then((res) => res.json())
@@ -121,101 +108,6 @@ function Home() {
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax;
 
-  const handleChange = (e) => {
-    setNewProduct({
-      ...newProduct,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const generateSku = (brand, name, storage, color) => {
-    const safeBrand = (brand || "GEN").trim();
-    const safeName = (name || "ITEM").trim();
-    const safeStorage = (storage || "").trim();
-    const safeColor = (color || "STD").trim();
-
-    const skuBrand = safeBrand.substring(0, 3).toUpperCase();
-
-    const nameParts = safeName.split(" ").filter(Boolean);
-    const skuModel =
-      nameParts.length > 0
-        ? nameParts[nameParts.length - 1].toUpperCase()
-        : "GEN";
-
-    let skuColor = "STD";
-    if (safeColor.length >= 3) {
-      skuColor = (safeColor.substring(0, 2) + safeColor.slice(-1)).toUpperCase();
-    } else if (safeColor.length > 0) {
-      skuColor = safeColor.toUpperCase();
-    }
-
-    const storageMatch = safeStorage.match(/\d+/);
-    const skuStorage = storageMatch ? storageMatch[0] : null;
-
-    return skuStorage
-      ? `${skuBrand}-${skuModel}-${skuStorage}-${skuColor}`
-      : `${skuBrand}-${skuModel}-${skuColor}`;
-  };
-
-  const addProduct = async (e) => {
-    e.preventDefault();
-
-    const generatedSku = generateSku(
-      newProduct.brand,
-      newProduct.name,
-      newProduct.storage,
-      newProduct.color
-    );
-
-    const productToSend = {
-      sku: generatedSku,
-      name: newProduct.name,
-      brand: newProduct.brand,
-      category: newProduct.category,
-      storage: newProduct.storage || null,
-      color: newProduct.color || "Standard",
-      price: Number(newProduct.price),
-      stock_quantity: Number(newProduct.stock_quantity),
-      description:
-        newProduct.description || `${newProduct.brand} ${newProduct.name}`
-    };
-
-    try {
-      const response = await fetch("http://localhost:8080/api/items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(productToSend)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setAllProducts([...allProducts, data]);
-
-        setNewProduct({
-          name: "",
-          brand: "",
-          category: "Smartphones",
-          storage: "",
-          color: "",
-          price: "",
-          stock_quantity: "10",
-          description: ""
-        });
-
-        setShowModal(false);
-      } else {
-        console.error(data.error);
-        alert(data.error || "Error adding item");
-      }
-    } catch (error) {
-      console.error("Error adding product:", error);
-      alert("Failed to connect to server");
-    }
-  };
-
   const categories = [
     { name: "all", label: "All Items", icon: <LayoutGrid size={18} /> },
     { name: "Laptops", icon: <Laptop size={18} /> },
@@ -233,8 +125,6 @@ function Home() {
     { name: "Networking", icon: <Router size={18} /> },
     { name: "Drones", icon: <Drone size={18} /> }
   ];
-
-  const productCategories = categories.filter((cat) => cat.name !== "all");
 
   return (
     <div className="container">
@@ -339,167 +229,11 @@ function Home() {
             <span>${total.toFixed(2)}</span>
           </div>
 
-          <button
-            className="checkout-btn"
-            onClick={() => setShowModal(true)}
-          >
-            Add New Product
+          <button className="checkout-btn">
+            Complete Payment
           </button>
         </div>
       </aside>
-
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content" style={{ width: "500px" }}>
-            <div className="modal-header">
-              <h3>Add New Product</h3>
-              <span
-                className="close-modal"
-                onClick={() => setShowModal(false)}
-              >
-                &times;
-              </span>
-            </div>
-
-            <form onSubmit={addProduct}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={newProduct.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. iPhone 15"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Brand</label>
-                  <input
-                    type="text"
-                    name="brand"
-                    value={newProduct.brand}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. Apple"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    name="category"
-                    value={newProduct.category}
-                    onChange={handleChange}
-                    required
-                  >
-                    {productCategories.map((cat) => (
-                      <option key={cat.name} value={cat.name}>
-                        {cat.label || cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Storage</label>
-                  <input
-                    type="text"
-                    name="storage"
-                    value={newProduct.storage}
-                    onChange={handleChange}
-                    placeholder="e.g. 128GB"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Colour</label>
-                  <input
-                    type="text"
-                    name="color"
-                    value={newProduct.color}
-                    onChange={handleChange}
-                    placeholder="e.g. Black Titanium"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Price ($)</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={newProduct.price}
-                    onChange={handleChange}
-                    required
-                    step="0.01"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Quantity (QTY)</label>
-                  <input
-                    type="number"
-                    name="stock_quantity"
-                    value={newProduct.stock_quantity}
-                    onChange={handleChange}
-                    required
-                    min="0"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>SKU</label>
-                  <input
-                    type="text"
-                    value={generateSku(
-                      newProduct.brand,
-                      newProduct.name,
-                      newProduct.storage,
-                      newProduct.color
-                    )}
-                    disabled
-                    placeholder="Auto-generated"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  name="description"
-                  value={newProduct.description}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Product description..."
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-
-                <button type="submit" className="submit-btn">
-                  Add Item
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
