@@ -30,14 +30,15 @@ function Home() {
   const [time, setTime] = useState("");
 
   // FETCH PRODUCTS
-  useEffect(() => {
-    fetch("http://localhost:8080/api/items")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllProducts(data);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+useEffect(() => {
+  fetch("http://localhost:8080/api/items")
+    .then(res => res.json())
+    .then(data => {
+      setAllProducts(Array.isArray(data) ? data : []);
+    })
+    .catch(err => console.error(err));
+}, []);
+
 
   // CLOCK
   useEffect(() => {

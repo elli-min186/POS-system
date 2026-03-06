@@ -88,11 +88,32 @@ app.get("/inventory", (req, res) => {
   res.sendFile(path.join(__dirname, "views/inventory.html"));
 });
 
-// GET all products
-app.get("/api/items", (req, res) => {
-  const products = readData();
-  res.json(products);
+// READ all items
+app.get("/api/items", async (req, res) => {
+  try {
+    const items = await Item.find();
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch items" });
+  }
 });
+
+// READ one item by ID
+app.get("/api/items/:id", async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    res.status(200).json(item);
+
+  } catch (error) {
+    res.status(500).json({ error: "Invalid ID or database error" });
+  }
+});
+
 
 // POST a new product
 app.post("/api/items", async (req, res) => {
