@@ -17,11 +17,10 @@ import {
   Drone,
   ShoppingCart
 } from "lucide-react";
-
+import ProductCard from "../components/ProductCard";
 import "../home.css";
 
 function Home() {
-
   const TAX_RATE = 0.13;
 
   const [allProducts, setAllProducts] = useState([]);
@@ -37,24 +36,23 @@ function Home() {
   const [newProduct, setNewProduct] = useState({
     name: "",
     brand: "",
-    sku: "",
-    category: "",
+    category: "Smartphones",
+    storage: "",
     color: "",
     price: "",
-    stock_quantity: ""
+    stock_quantity: "10",
+    description: ""
   });
 
-  // FETCH PRODUCTS
   useEffect(() => {
     fetch("http://localhost:8080/api/items")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setAllProducts(Array.isArray(data) ? data : []);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, []);
 
-  // CLOCK
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
@@ -71,40 +69,31 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // FILTER
   useEffect(() => {
-
     const filtered = allProducts.filter((p) => {
-
       const matchesSearch =
         p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.brand?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === "all" ||
-        p.category === selectedCategory;
+        selectedCategory === "all" || p.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
-
     });
 
     setFilteredProducts(filtered);
-
   }, [searchTerm, selectedCategory, allProducts]);
 
   const filterCategory = (category) => {
     setSelectedCategory(category);
   };
 
-  // CART
   const addToCart = (product) => {
-
     const existing = cart.find(
       (item) => item.product_id === product.product_id
     );
 
     if (existing) {
-
       setCart(
         cart.map((item) =>
           item.product_id === product.product_id
@@ -112,21 +101,15 @@ function Home() {
             : item
         )
       );
-
     } else {
-
       setCart([...cart, { ...product, quantity: 1 }]);
-
     }
-
   };
 
   const removeFromCart = (index) => {
-
     const newCart = [...cart];
     newCart.splice(index, 1);
     setCart(newCart);
-
   };
 
   const clearCart = () => setCart([]);
@@ -135,68 +118,102 @@ function Home() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax;
 
-  // FORM INPUT
   const handleChange = (e) => {
-
     setNewProduct({
       ...newProduct,
       [e.target.name]: e.target.value
     });
-
   };
 
-  // ADD PRODUCT API
-  const addProduct = async (e) => {
+  const generateSku = (brand, name, storage, color) => {
+    const safeBrand = (brand || "GEN").trim();
+    const safeName = (name || "ITEM").trim();
+    const safeStorage = (storage || "").trim();
+    const safeColor = (color || "STD").trim();
 
+    const skuBrand = safeBrand.substring(0, 3).toUpperCase();
+
+    const nameParts = safeName.split(" ").filter(Boolean);
+    const skuModel =
+      nameParts.length > 0
+        ? nameParts[nameParts.length - 1].toUpperCase()
+        : "GEN";
+
+    let skuColor = "STD";
+    if (safeColor.length >= 3) {
+      skuColor = (safeColor.substring(0, 2) + safeColor.slice(-1)).toUpperCase();
+    } else if (safeColor.length > 0) {
+      skuColor = safeColor.toUpperCase();
+    }
+
+    const storageMatch = safeStorage.match(/\d+/);
+    const skuStorage = storageMatch ? storageMatch[0] : null;
+
+    return skuStorage
+      ? `${skuBrand}-${skuModel}-${skuStorage}-${skuColor}`
+      : `${skuBrand}-${skuModel}-${skuColor}`;
+  };
+
+  const addProduct = async (e) => {
     e.preventDefault();
 
+    const generatedSku = generateSku(
+      newProduct.brand,
+      newProduct.name,
+      newProduct.storage,
+      newProduct.color
+    );
+
+    const productToSend = {
+      sku: generatedSku,
+      name: newProduct.name,
+      brand: newProduct.brand,
+      category: newProduct.category,
+      storage: newProduct.storage || null,
+      color: newProduct.color || "Standard",
+      price: Number(newProduct.price),
+      stock_quantity: Number(newProduct.stock_quantity),
+      description:
+        newProduct.description || `${newProduct.brand} ${newProduct.name}`
+    };
+
     try {
-
       const response = await fetch("http://localhost:8080/api/items", {
-
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-
-        body: JSON.stringify(newProduct)
-
+        body: JSON.stringify(productToSend)
       });
 
       const data = await response.json();
 
       if (response.ok) {
-
         setAllProducts([...allProducts, data]);
 
         setNewProduct({
           name: "",
           brand: "",
-          sku: "",
-          category: "",
+          category: "Smartphones",
+          storage: "",
           color: "",
           price: "",
-          stock_quantity: ""
+          stock_quantity: "10",
+          description: ""
         });
 
         setShowModal(false);
-
       } else {
-
         console.error(data.error);
-
+        alert(data.error || "Error adding item");
       }
-
     } catch (error) {
-
       console.error("Error adding product:", error);
-
+      alert("Failed to connect to server");
     }
-
   };
 
   const categories = [
@@ -217,18 +234,13 @@ function Home() {
     { name: "Drones", icon: <Drone size={18} /> }
   ];
 
+  const productCategories = categories.filter((cat) => cat.name !== "all");
+
   return (
-
     <div className="container">
-
-      {/* SIDEBAR */}
-
       <aside className="sidebar">
-
         <div>
-
           <div className="logo-area">
-
             <div className="logo-icon">
               <ShoppingCart size={20} />
             </div>
@@ -237,165 +249,93 @@ function Home() {
               <h2>TechPOS</h2>
               <span className="subtitle">{time}</span>
             </div>
-
           </div>
 
           <nav className="categories">
-
             <h3>CATEGORIES</h3>
 
             <ul>
-
               {categories.map((cat) => (
-
                 <li
                   key={cat.name}
                   className={selectedCategory === cat.name ? "active" : ""}
                   onClick={() => filterCategory(cat.name)}
                 >
-
                   {cat.icon}
                   {cat.label || cat.name}
-
                 </li>
-
               ))}
-
             </ul>
-
           </nav>
-
         </div>
-
       </aside>
 
-      {/* MAIN */}
-
       <main className="main-content">
-
         <header className="top-bar">
-
           <div className="header-left">
-
             <h1>
-              {selectedCategory === "all"
-                ? "All Items"
-                : selectedCategory}
+              {selectedCategory === "all" ? "All Items" : selectedCategory}
             </h1>
 
-            <span className="tag">
-              {filteredProducts.length} items
-            </span>
-
+            <span className="tag">{filteredProducts.length} items</span>
           </div>
 
           <div className="search-bar">
-
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-
           </div>
 
           <div className="header-right">
             <span>{time}</span>
           </div>
-
         </header>
 
-        {/* PRODUCTS */}
-
         <div className="product-grid">
-
           {filteredProducts.map((item) => (
-
-            <div
-              key={item.product_id}
-              className="card"
+            <ProductCard
+              key={item.product_id ?? item._id}
+              item={item}
               onClick={() => addToCart(item)}
-            >
-
-              <div className="card-content">
-
-                <span className="brand">{item.brand}</span>
-                <h3 className="title">{item.name}</h3>
-                <span className="sku">{item.sku}</span>
-
-                <div className="card-footer">
-
-                  <span className="price">
-                    ${Number(item.price).toFixed(2)}
-                  </span>
-
-                  <span className="stock-badge">
-                    {item.stock_quantity} Left
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
+            />
           ))}
-
         </div>
-
       </main>
 
-      {/* ORDER PANEL */}
-
       <aside className="order-panel">
-
         <div className="order-header">
-
           <h3>Current Order</h3>
 
-          <button
-            className="clear-cart-btn"
-            onClick={clearCart}
-          >
+          <button className="clear-cart-btn" onClick={clearCart}>
             Clear
           </button>
-
         </div>
 
         <div className="order-list">
-
           {cart.length === 0 ? (
-
             <div className="empty-state">
-
               <div className="icon-circle">
                 <ShoppingCart size={28} />
               </div>
 
               <p>No items in order</p>
               <small>Tap products to add them here</small>
-
             </div>
-
           ) : (
-
             cart.map((item, index) => (
-
               <div key={index} className="cart-item">
-
                 <div className="item-details">
-
                   <strong>{item.name}</strong>
 
                   <div className="item-math">
                     {item.quantity} x ${item.price.toFixed(2)}
                   </div>
-
                 </div>
 
                 <div className="item-right">
-
                   <span className="item-total">
                     ${(item.price * item.quantity).toFixed(2)}
                   </span>
@@ -406,19 +346,13 @@ function Home() {
                   >
                     ✕
                   </button>
-
                 </div>
-
               </div>
-
             ))
-
           )}
-
         </div>
 
         <div className="order-total-section">
-
           <div className="row">
             <span>Subtotal</span>
             <span>${subtotal.toFixed(2)}</span>
@@ -440,56 +374,163 @@ function Home() {
           >
             Add New Product
           </button>
-
         </div>
-
       </aside>
 
-      {/* MODAL */}
-
       {showModal && (
-
         <div className="modal">
-
-          <div className="modal-content">
-
+          <div className="modal-content" style={{ width: "500px" }}>
             <div className="modal-header">
+              <h3>Add New Product</h3>
 
-              <h3>Add Product</h3>
-
-              <div
+              <span
                 className="close-modal"
                 onClick={() => setShowModal(false)}
               >
-                ✕
-              </div>
-
+                &times;
+              </span>
             </div>
 
             <form onSubmit={addProduct}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newProduct.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g. iPhone 15"
+                  />
+                </div>
 
-              <input name="name" placeholder="Name" value={newProduct.name} onChange={handleChange} required />
-              <input name="brand" placeholder="Brand" value={newProduct.brand} onChange={handleChange} required />
-              <input name="sku" placeholder="SKU" value={newProduct.sku} onChange={handleChange} required />
-              <input name="category" placeholder="Category" value={newProduct.category} onChange={handleChange} required />
-              <input name="color" placeholder="Color" value={newProduct.color} onChange={handleChange} required />
-              <input name="price" type="number" placeholder="Price" value={newProduct.price} onChange={handleChange} required />
-              <input name="stock_quantity" type="number" placeholder="Stock" value={newProduct.stock_quantity} onChange={handleChange} required />
+                <div className="form-group">
+                  <label>Brand</label>
+                  <input
+                    type="text"
+                    name="brand"
+                    value={newProduct.brand}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g. Apple"
+                  />
+                </div>
+              </div>
 
-              <button type="submit">
-                Add Product
-              </button>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Category</label>
+                  <select
+                    name="category"
+                    value={newProduct.category}
+                    onChange={handleChange}
+                    required
+                  >
+                    {productCategories.map((cat) => (
+                      <option key={cat.name} value={cat.name}>
+                        {cat.label || cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
+                <div className="form-group">
+                  <label>Storage</label>
+                  <input
+                    type="text"
+                    name="storage"
+                    value={newProduct.storage}
+                    onChange={handleChange}
+                    placeholder="e.g. 128GB"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Colour</label>
+                  <input
+                    type="text"
+                    name="color"
+                    value={newProduct.color}
+                    onChange={handleChange}
+                    placeholder="e.g. Black Titanium"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Price ($)</label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={newProduct.price}
+                    onChange={handleChange}
+                    required
+                    step="0.01"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Quantity (QTY)</label>
+                  <input
+                    type="number"
+                    name="stock_quantity"
+                    value={newProduct.stock_quantity}
+                    onChange={handleChange}
+                    required
+                    min="0"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>SKU</label>
+                  <input
+                    type="text"
+                    value={generateSku(
+                      newProduct.brand,
+                      newProduct.name,
+                      newProduct.storage,
+                      newProduct.color
+                    )}
+                    disabled
+                    placeholder="Auto-generated"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={newProduct.description}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="Product description..."
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button type="submit" className="submit-btn">
+                  Add Item
+                </button>
+              </div>
             </form>
-
           </div>
-
         </div>
-
       )}
-
     </div>
-
   );
 }
 

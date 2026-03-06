@@ -21,9 +21,9 @@ The application demonstrates as the marking rubric requires:
 
 - Use ```npm i``` in both frontend and backend folders to install necessary packages to run the project
 - To start the backend: ```cd backend``` & ```npm run start``` 
-    - To run in brower: http://localhost:5173
+    - To run in brower: http://localhost:8080
 - To start the frontend: ```cd frontend``` & ```npm run dev```
-    - To run in browser: http://localhost:8080
+    - To run in browser: http://localhost:5173
 
 - To install MongoDB in Mac: ```brew install mongodb-community``` 
 - To run MongoDB in Mac: ```brew services start mongodb/brew/mongodb-community```

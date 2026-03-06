@@ -80,7 +80,6 @@ app.get("/", (req, res) => {
 
 // REST Api
 
-
 // READ ALL ITEMS
 app.get("/api/items", async (req, res) => {
 
