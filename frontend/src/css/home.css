@@ -681,6 +681,26 @@ body {
     width: 100%;
 }
 
+.confirm-modal {
+    width: 400px;
+    max-width: 90vw;
+}
+
+.confirm-text {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.delete-confirm-btn {
+    background: #ef4444;
+}
+
+.delete-confirm-btn:hover {
+    background: #dc2626;
+}
+
 @keyframes popup {
     from {
         transform: scale(0.95);

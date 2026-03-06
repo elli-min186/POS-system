@@ -82,70 +82,53 @@ app.get("/", (req, res) => {
 
 // READ ALL ITEMS
 app.get("/api/items", async (req, res) => {
-
   try {
-
-    const items = await Products.find();
-
+    const items = await Products.find().sort({ product_id: 1 });
     res.status(200).json(items);
-
   } catch (error) {
-
+    console.error("Read all error:", error);
     res.status(500).json({
       error: "Failed to fetch items"
     });
-
   }
-
 });
 
 
-// READ ONE ITEM
+// READ ONE ITEM BY product_id
 app.get("/api/items/:id", async (req, res) => {
-
   try {
+    const productId = parseInt(req.params.id);
 
-    const item = await Products.findById(req.params.id);
+    const item = await Products.findOne({ product_id: productId });
 
     if (!item) {
-
       return res.status(404).json({
         error: "Item not found"
       });
-
     }
 
     res.status(200).json(item);
-
   } catch (error) {
-
+    console.error("Read one error:", error);
     res.status(500).json({
       error: "Invalid ID or database error"
     });
-
   }
-
 });
 
 
 // CREATE ITEM
 app.post("/api/items", async (req, res) => {
-
   try {
-
     const userInput = req.body;
 
     if (!userInput.name || !userInput.price) {
-
       return res.status(400).json({
         error: "Name and Price are required"
       });
-
     }
 
-    // auto increment product_id
     const lastProduct = await Products.findOne().sort({ product_id: -1 });
-
     const newId = lastProduct ? lastProduct.product_id + 1 : 1;
 
     const newItem = new Products({
@@ -158,82 +141,70 @@ app.post("/api/items", async (req, res) => {
     console.log(`Added Item: ${newItem.name} (ID: ${newId})`);
 
     res.status(201).json(newItem);
-
   } catch (error) {
-
+    console.error("Create error:", error);
     res.status(400).json({
       error: "Failed to create item",
       details: error.message
     });
-
   }
-
 });
 
 
-// UPDATE ITEM
+// UPDATE ITEM BY product_id
 app.put("/api/items/:id", async (req, res) => {
-
   try {
+    const productId = parseInt(req.params.id);
 
-    const updatedItem = await Products.findByIdAndUpdate(
-      req.params.id,
+    const updatedItem = await Products.findOneAndUpdate(
+      { product_id: productId },
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedItem) {
-
       return res.status(404).json({
         error: "Item not found"
       });
-
     }
 
     res.status(200).json(updatedItem);
-
   } catch (error) {
-
+    console.error("Update error:", error);
     res.status(400).json({
       error: "Failed to update item"
     });
-
   }
-
 });
 
 
-// DELETE ITEM
+// DELETE ITEM BY product_id
 app.delete("/api/items/:id", async (req, res) => {
-
   try {
+    const productId = parseInt(req.params.id);
 
-    const deletedItem = await Products.findByIdAndDelete(req.params.id);
+    const deletedItem = await Products.findOneAndDelete({
+      product_id: productId
+    });
 
     if (!deletedItem) {
-
       return res.status(404).json({
         error: "Item not found"
       });
-
     }
 
-    console.log(`Deleted Item: ${deletedItem.name}`);
+    console.log(`Deleted Item: ${deletedItem.name} (ID: ${deletedItem.product_id})`);
 
     res.status(200).json({
       message: "Item deleted"
     });
-
   } catch (error) {
-
+    console.error("Delete error:", error);
     res.status(500).json({
       error: "Failed to delete item"
     });
-
   }
-
 });
-
 
 // Server Start
 

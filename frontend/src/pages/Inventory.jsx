@@ -28,6 +28,7 @@ function Inventory() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -107,7 +108,7 @@ function Inventory() {
     return matchesCategory && matchesSearch;
   });
 
-  const deleteItem = async (id) => {
+  const confirmDeleteItem = async (id) => {
     try {
       const response = await fetch(`http://localhost:8080/api/items/${id}`, {
         method: "DELETE"
@@ -120,6 +121,7 @@ function Inventory() {
       }
 
       setItems((prev) => prev.filter((item) => item.product_id !== id));
+      setItemToDelete(null);
     } catch (err) {
       console.error("Error deleting item:", err);
       alert(err.message || "Failed to delete item");
@@ -267,7 +269,7 @@ function Inventory() {
               <InventoryCard
                 key={item.product_id}
                 item={item}
-                onDelete={deleteItem}
+                onDelete={(id, name) => setItemToDelete({ id, name })}
               />
             ))}
           </div>
@@ -424,6 +426,46 @@ function Inventory() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {itemToDelete && (
+        <div className="modal">
+          <div className="modal-content confirm-modal">
+            <div className="modal-header">
+              <h3>Delete Product</h3>
+
+              <span
+                className="close-modal"
+                onClick={() => setItemToDelete(null)}
+              >
+                &times;
+              </span>
+            </div>
+
+            <p className="confirm-text">
+              Are you sure you want to delete{" "}
+              <strong>{itemToDelete.name}</strong>?
+            </p>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setItemToDelete(null)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="submit-btn delete-confirm-btn"
+                onClick={() => confirmDeleteItem(itemToDelete.id)}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -8,8 +8,10 @@ function InventoryCard({ item, onDelete }) {
         style={{ opacity: 1, transform: "scale(1)" }}
         onClick={(e) => {
           e.stopPropagation();
-          onDelete(item.product_id);
+          onDelete(item.product_id, item.name);
         }}
+        type="button"
+        title="Delete item"
       >
         <Trash2 size={16} />
       </button>
