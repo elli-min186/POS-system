@@ -1,7 +1,24 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  LayoutGrid,
+  Laptop,
+  TabletSmartphone,
+  Tablet,
+  Keyboard,
+  BookCheck,
+  Headphones,
+  Watch,
+  Gamepad2,
+  Monitor,
+  Camera,
+  HardDrive,
+  House,
+  Router,
+  Drone
+} 
+from "lucide-react";
+import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
-import ProductCard from "../components/ProductCard";
 import "../css/home.css";
 
 function Inventory() {
@@ -9,19 +26,7 @@ function Inventory() {
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [time, setTime] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    brand: "",
-    category: "Smartphones",
-    storage: "",
-    color: "",
-    price: "",
-    stock_quantity: "10",
-    description: ""
-  });
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     fetchItems();
@@ -59,15 +64,61 @@ function Inventory() {
     fetch("http://localhost:8080/api/items")
       .then((res) => res.json())
       .then((data) => {
-        const safeData = Array.isArray(data) ? data : [];
-        setItems(safeData);
-        setFilteredItems(safeData);
+        setItems(data);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching items:", err);
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setTime(
+        now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    };
+
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const categories = [
+    { name: "all", label: "All Items", icon: <LayoutGrid size={18} /> },
+    { name: "Laptops", icon: <Laptop size={18} /> },
+    { name: "Smartphones", label: "Phones", icon: <TabletSmartphone size={18} /> },
+    { name: "Tablets", icon: <Tablet size={18} /> },
+    { name: "Accessories", icon: <Keyboard size={18} /> },
+    { name: "E-Readers", icon: <BookCheck size={18} /> },
+    { name: "Audio", icon: <Headphones size={18} /> },
+    { name: "Wearables", icon: <Watch size={18} /> },
+    { name: "Gaming", icon: <Gamepad2 size={18} /> },
+    { name: "Monitors", icon: <Monitor size={18} /> },
+    { name: "Cameras", icon: <Camera size={18} /> },
+    { name: "Storage", icon: <HardDrive size={18} /> },
+    { name: "Smart Home", icon: <House size={18} /> },
+    { name: "Networking", icon: <Router size={18} /> },
+    { name: "Drones", icon: <Drone size={18} /> }
+  ];
+
+  const filteredItems = items.filter((item) => {
+    return selectedCategory === "all" || item.category === selectedCategory;
+  });
+
+  const deleteItem = (id) => {
+    fetch(`http://localhost:8080/api/items/${id}`, {
+      method: "DELETE"
+    })
+      .then(() => {
+        setItems(items.filter((item) => item.product_id !== id));
+      })
+      .catch((err) => console.error("Error deleting item:", err));
   };
 
   const deleteItem = async (id) => {
@@ -202,7 +253,10 @@ function Inventory() {
     <div className="container">
       <Sidebar
         time={time}
-        showCategories={false}
+        showCategories={true}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
         activePage="inventory"
       />
 
@@ -213,208 +267,25 @@ function Inventory() {
             <span className="tag">{filteredItems.length} items</span>
           </div>
 
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search inventory..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
           <div className="header-right">
-            <button
-              className="checkout-btn inventory-add-btn"
-              onClick={() => setShowModal(true)}
-              type="button"
-            >
-              <Plus size={18} />
-              Add New Product
-            </button>
+            <span>{time}</span>
           </div>
         </header>
 
         {loading ? (
-          <div className="empty-state">
-            <p>Loading inventory...</p>
-          </div>
+          <p>Loading inventory...</p>
         ) : (
           <div className="product-grid">
             {filteredItems.map((item) => (
-              <ProductCard
-                key={item.product_id ?? item._id}
+              <InventoryCard
+                key={item.product_id}
                 item={item}
-              >
-                <button
-                  className="delete-btn inventory-delete-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteItem(item.product_id);
-                  }}
-                  type="button"
-                  title="Delete item"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </ProductCard>
+                onDelete={deleteItem}
+              />
             ))}
           </div>
         )}
       </main>
-
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content" style={{ width: "500px" }}>
-            <div className="modal-header">
-              <h3>Add New Product</h3>
-
-              <span
-                className="close-modal"
-                onClick={() => setShowModal(false)}
-              >
-                &times;
-              </span>
-            </div>
-
-            <form onSubmit={addProduct}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={newProduct.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. iPhone 15"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Brand</label>
-                  <input
-                    type="text"
-                    name="brand"
-                    value={newProduct.brand}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. Apple"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    name="category"
-                    value={newProduct.category}
-                    onChange={handleChange}
-                    required
-                  >
-                    {inventoryCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Storage</label>
-                  <input
-                    type="text"
-                    name="storage"
-                    value={newProduct.storage}
-                    onChange={handleChange}
-                    placeholder="e.g. 128GB"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Color</label>
-                  <input
-                    type="text"
-                    name="color"
-                    value={newProduct.color}
-                    onChange={handleChange}
-                    placeholder="e.g. Black Titanium"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Price ($)</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={newProduct.price}
-                    onChange={handleChange}
-                    required
-                    step="0.01"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Stock Qty</label>
-                  <input
-                    type="number"
-                    name="stock_quantity"
-                    value={newProduct.stock_quantity}
-                    onChange={handleChange}
-                    required
-                    min="0"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>SKU</label>
-                  <input
-                    type="text"
-                    value={generateSku(
-                      newProduct.brand,
-                      newProduct.name,
-                      newProduct.storage,
-                      newProduct.color
-                    )}
-                    disabled
-                    placeholder="Auto-generated"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  name="description"
-                  value={newProduct.description}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Product description..."
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-
-                <button type="submit" className="submit-btn">
-                  Add Item
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
