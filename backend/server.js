@@ -23,8 +23,9 @@ const db = mongoose.connection;
 db.on("error", function (e) {
   console.log("error connecting" + e);
 });
-db.on("open", function () {
+db.on("open", async function () {
   console.log("database connected!");
+  await seedProducts();
 });
 
 const DATA_FILE = path.join(__dirname, "data", "products.json");
@@ -48,6 +49,27 @@ const writeData = (data) => {
     console.error("Error writing file:", err);
   }
 };
+
+// --- Test function to load products.json into MongoDB on startup ---
+async function seedProducts() {
+  try {
+    const existingProducts = await Products.countDocuments();
+
+    if (existingProducts === 0) {
+      const products = readData();
+
+      if (products.length > 0) {
+        await Products.insertMany(products);
+        console.log("Products inserted into MongoDB");
+      }
+    } else {
+      console.log("Products already exist in MongoDB");
+    }
+
+  } catch (error) {
+    console.error("Error seeding products:", error);
+  }
+}
 
 // --- Routes for frontend ---
 
