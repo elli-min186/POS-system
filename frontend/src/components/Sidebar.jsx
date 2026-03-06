@@ -73,6 +73,14 @@ function Sidebar({
               Inventory
             </Link>
           </li>
+
+
+          <li className={activePage === "addItem" ? "active" : ""}>
+            <Link to="/addItem" className="nav-link">
+              <Boxes size={18} />
+              Add 
+            </Link>
+          </li>
         </ul>
       </div>
     </aside>
