@@ -6,7 +6,6 @@ import Sidebar from "../components/Sidebar";
 function Earnings() {
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
-  const [time, setTime] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/api/items")
@@ -20,21 +19,6 @@ function Earnings() {
       .catch((err) => console.error("Error fetching sales:", err));
   }, []);
 
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const earningsRows = useMemo(() => {
     return products.map((product) => {
@@ -60,7 +44,6 @@ function Earnings() {
   return (
     <div className="container">
       <Sidebar
-        time={time}
         showCategories={false}
         activePage="earnings"
       />
@@ -72,10 +55,6 @@ function Earnings() {
             <span className="tag" id="total-revenue">
               ${totalRevenue.toFixed(2)} Total Revenue
             </span>
-          </div>
-
-          <div className="header-right">
-            <span>{time}</span>
           </div>
         </header>
 

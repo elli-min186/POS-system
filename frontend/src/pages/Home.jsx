@@ -14,7 +14,8 @@ import {
   HardDrive,
   House,
   Router,
-  Drone
+  Drone,
+  ShoppingCart
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
@@ -29,7 +30,6 @@ function Home() {
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [time, setTime] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/api/items")
@@ -38,22 +38,6 @@ function Home() {
         setAllProducts(Array.isArray(data) ? data : []);
       })
       .catch((err) => console.error(err));
-  }, []);
-
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -108,6 +92,35 @@ function Home() {
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax;
 
+  const handleCheckout = async () => {
+    if (cart.length === 0) return alert("Cart is empty!");
+
+    const invoiceData = {
+      items: cart,
+      subtotal: subtotal,
+      tax: tax,
+      total: total,
+      date: new Date().toISOString()
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/invoices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(invoiceData),
+      });
+
+      if (response.ok) {
+        alert("Payment successful! Invoice created.");
+        clearCart(); // Clear the cart after a successful order
+      } else {
+        alert("Failed to create invoice.");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+    }
+  };
+
   const categories = [
     { name: "all", label: "All Items", icon: <LayoutGrid size={18} /> },
     { name: "Laptops", icon: <Laptop size={18} /> },
@@ -129,7 +142,6 @@ function Home() {
   return (
     <div className="container">
       <Sidebar
-        time={time}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
@@ -146,17 +158,13 @@ function Home() {
             <span className="tag">{filteredProducts.length} items</span>
           </div>
 
-          <div className="search-bar">
+          <div className="search-bar home">
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
-
-          <div className="header-right">
-            <span>{time}</span>
           </div>
         </header>
 
@@ -182,7 +190,7 @@ function Home() {
         <div className="order-list">
           {cart.length === 0 ? (
             <div className="empty-state">
-              <div className="icon-circle">🛒</div>
+              <div className="icon-circle"><ShoppingCart /></div>
               <p>No items in order</p>
               <small>Tap products to add them here</small>
             </div>
@@ -229,7 +237,7 @@ function Home() {
             <span>${total.toFixed(2)}</span>
           </div>
 
-          <button className="checkout-btn">
+          <button className="checkout-btn" onClick={handleCheckout}>
             Complete Payment
           </button>
         </div>

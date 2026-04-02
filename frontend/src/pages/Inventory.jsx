@@ -19,16 +19,17 @@ import {
 } from "lucide-react";
 import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
-import "../css/home.css";
+import "../css/inventory.css";
 
 function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -55,22 +56,6 @@ function Inventory() {
 
   useEffect(() => {
     fetchItems();
-  }, []);
-
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const fetchItems = () => {
@@ -182,6 +167,23 @@ function Inventory() {
       ...editForm,
       [e.target.name]: e.target.value
     });
+    setHasUnsavedChanges(true);
+  };
+
+
+  const handleClosePanel = () => {
+    if (hasUnsavedChanges) {
+      // Triggers the built-in browser popup
+      const confirmExit = window.confirm("You have unsaved changes. Are you sure you want to exit without saving?");
+
+      if (!confirmExit) {
+        return; // Stops the function if they click "Cancel" on the popup
+      }
+    }
+
+    // If they clicked "OK" (or had no changes), clear the panel
+    setSelectedItem(null);
+    setHasUnsavedChanges(false); // Reset the tracker
   };
 
   const generateSku = (brand, name, storage, color) => {
@@ -324,7 +326,6 @@ function Inventory() {
   return (
     <div className="container">
       <Sidebar
-        time={time}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
@@ -381,9 +382,21 @@ function Inventory() {
           <>
             <div className="order-header">
               <h3>Edit Product</h3>
+              <button onClick={handleClosePanel} className="close-btn">
+                x
+              </button>
             </div>
 
+
             <div className="order-list">
+
+              {/* <div className="form-group">
+                <label>SKU</label>
+                <div className="read-only-value">
+                  {selectedItem.sku || ""}
+                </div>
+              </div> */}
+
               <div className="form-group">
                 <label>Product Name</label>
                 <input
@@ -459,11 +472,6 @@ function Inventory() {
                   onChange={handleEditChange}
                   min="0"
                 />
-              </div>
-
-              <div className="form-group">
-                <label>SKU</label>
-                <input type="text" value={selectedItem.sku || ""} disabled />
               </div>
 
               <div className="form-group">

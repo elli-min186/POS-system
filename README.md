@@ -26,8 +26,8 @@ The application demonstrates as the marking rubric requires:
     - To run in browser: http://localhost:5173
 
 - To install MongoDB in Mac: ```brew install mongodb-community``` 
-- To run MongoDB in Mac: ```brew services start mongodb/brew/mongodb-community```
-- To stop MongoBD in Mac: ```brew services stop mongodb/brew/mongodb-community```
+- To run MongoDB in Mac: ```brew services start mongodb-community```
+- To stop MongoBD in Mac: ```brew services stop mongodb-community```
 
 - To install mongoose in backend: ```npm install mongoose```
 
