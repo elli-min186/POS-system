@@ -20,6 +20,7 @@ import {
 import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
 import "../css/inventory.css";
+import Header from "../components/Header";
 
 function Inventory() {
   const [items, setItems] = useState([]);
@@ -334,22 +335,14 @@ function Inventory() {
       />
 
       <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
-            <h1>Inventory</h1>
-            <span className="tag">{filteredItems.length} items</span>
-          </div>
-
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search inventory..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="header-right">
+        <Header
+          title="Inventory"
+          tagText={`${filteredItems.length} items`}
+          showSearch={true}
+          searchPlaceholder="Search inventory..."
+          searchValue={searchTerm}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          rightAction={
             <button
               className="checkout-btn inventory-add-btn"
               onClick={() => setShowModal(true)}
@@ -358,8 +351,8 @@ function Inventory() {
               <Plus size={18} />
               Add New Product
             </button>
-          </div>
-        </header>
+          }
+        />
 
         {loading ? (
           <p>Loading inventory...</p>

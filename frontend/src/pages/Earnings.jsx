@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "../css/home.css";
-import "../css/earnings.css";
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 function Earnings() {
   const [products, setProducts] = useState([]);
@@ -49,17 +49,15 @@ function Earnings() {
       />
 
       <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
-            <h1 id="page-title">Earnings Report</h1>
-            <span className="tag" id="total-revenue">
-              ${totalRevenue.toFixed(2)} Total Revenue
-            </span>
-          </div>
-        </header>
+        <Header
+          title="Earnings Report"
+          titleId="page-title"
+          tagText={`$${totalRevenue.toFixed(2)} Total Revenue`}
+          tagId="total-revenue"
+        />
 
-        <div className="earnings-table-wrapper">
-          <table className="earnings-table">
+        <div className="shared-table-wrapper">
+          <table className="shared-table">
             <thead>
               <tr>
                 <th>Product</th>
@@ -83,7 +81,7 @@ function Earnings() {
 
               {earningsRows.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="empty-earnings">
+                  <td colSpan="5" className="empty-shared">
                     No earnings data available.
                   </td>
                 </tr>

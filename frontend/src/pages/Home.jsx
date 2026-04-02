@@ -20,6 +20,7 @@ import {
 import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
 import "../css/home.css";
+import Header from "../components/Header";
 
 function Home() {
   const TAX_RATE = 0.13;
@@ -150,23 +151,15 @@ function Home() {
       />
 
       <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
-            <h1>
-              {selectedCategory === "all" ? "All Items" : selectedCategory}
-            </h1>
-            <span className="tag">{filteredProducts.length} items</span>
-          </div>
-
-          <div className="search-bar home">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </header>
+        <Header
+          title={selectedCategory === "all" ? "All Items" : selectedCategory}
+          tagText={`${filteredProducts.length} items`}
+          showSearch={true}
+          searchClass="home"
+          searchPlaceholder="Search products..."
+          searchValue={searchTerm}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         <div className="product-grid">
           {filteredProducts.map((item) => (

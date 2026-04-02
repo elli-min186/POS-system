@@ -7,7 +7,7 @@
     --text-grey: #64748b;
     --border: #e2e8f0;
     --danger: #ef4444;
-  
+
     font-family: 'Segoe UI', system-ui, sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -23,7 +23,8 @@
     box-sizing: border-box;
 }
 
-i, svg {
+i,
+svg {
     vertical-align: middle;
 }
 
@@ -52,6 +53,55 @@ i, svg {
     flex-direction: column;
 }
 
+/* --- INVOICES AND EARNING PAGE SHARED TABLE --- */
+.shared-table-wrapper {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.shared-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+}
+
+.shared-table thead {
+    background: #f8fafc;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.shared-table th,
+.shared-table td {
+    padding: 16px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.shared-table th {
+    color: var(--text-grey);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.shared-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.empty-shared {
+    text-align: center;
+    color: var(--text-grey);
+    padding: 32px;
+}
+
 /* --- SIDEBAR & NAVIGATION --- */
 .logo-area {
     display: flex;
@@ -77,14 +127,16 @@ i, svg {
     opacity: 0.6;
 }
 
-.categories h3, .sidebar-bottom h3 {
+.categories h3,
+.sidebar-bottom h3 {
     font-size: 0.7rem;
     letter-spacing: 1px;
     margin-bottom: 15px;
     color: #94a3b8;
 }
 
-.categories ul, .sidebar-bottom ul {
+.categories ul,
+.sidebar-bottom ul {
     list-style: none;
 }
 
@@ -93,9 +145,9 @@ i, svg {
     margin-bottom: 5px;
     cursor: pointer;
     border-radius: 8px;
-    display: flex;        
-    align-items: center;  
-    gap: 10px;             
+    display: flex;
+    align-items: center;
+    gap: 10px;
     transition: 0.2s;
 }
 
@@ -115,12 +167,14 @@ i, svg {
     justify-content: center;
 }
 
-.categories li:hover, .sidebar-bottom li:hover {
+.categories li:hover,
+.sidebar-bottom li:hover {
     background-color: #1e293b;
     color: var(--white);
 }
 
-.categories li.active, .sidebar-bottom li.active {
+.categories li.active,
+.sidebar-bottom li.active {
     background-color: var(--primary);
     color: var(--white);
 }
@@ -148,13 +202,14 @@ i, svg {
     color: inherit;
     text-decoration: none;
     width: 100%;
-    padding: 12px 15px; 
+    padding: 12px 15px;
     height: 100%;
 }
 
 /* --- TOP BAR & SEARCH --- */
 .top-bar {
     display: flex;
+    height: 80px;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
@@ -478,11 +533,25 @@ i, svg {
 
 /* --- ANIMATIONS --- */
 @keyframes popup {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

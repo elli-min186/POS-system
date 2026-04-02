@@ -23,7 +23,7 @@ function Invoices() {
     <div className="container">
       <Sidebar activePage="invoices" showCategories={false} />
 
-      <main className="main-content" style={{ padding: "2rem", width: "100%" }}>
+      <main className="main-content">
         <header className="top-bar">
           <div className="header-left">
             <h1>Sales Invoices</h1>
@@ -34,10 +34,10 @@ function Invoices() {
         {loading ? (
           <p>Loading invoices...</p>
         ) : (
-          <div className="invoice-table-container">
-            <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
+          <div className="shared-table-wrapper">
+            <table className="shared-table">
               <thead>
-                <tr style={{ borderBottom: "2px solid #eee", paddingBottom: "10px" }}>
+                <tr>
                   <th>Invoice ID</th>
                   <th>Date</th>
                   <th>Total Items</th>
@@ -46,17 +46,18 @@ function Invoices() {
                   <th>Total Paid</th>
                 </tr>
               </thead>
+              
               <tbody>
                 {invoices.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: "center", paddingTop: "2rem" }}>
+                    <td colSpan="6" className="empty-shared">
                       No invoices found. Make a sale first!
                     </td>
                   </tr>
                 ) : (
                   invoices.map((inv) => (
-                    <tr key={inv._id || inv.id} style={{ borderBottom: "1px solid #eee" }}>
-                      <td style={{ padding: "12px 0" }}>{inv._id || inv.id}</td>
+                    <tr key={inv._id || inv.id}>
+                      <td>#{inv.invoice_id}</td>
                       <td>{new Date(inv.date || inv.createdAt).toLocaleString()}</td>
                       <td>
                         {inv.items?.reduce((sum, item) => sum + item.quantity, 0)}
