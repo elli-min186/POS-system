@@ -20,6 +20,8 @@ import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
 import "../css/home.css";
 
+const role = localStorage.getItem("role") || "worker";
+
 function Home() {
   const TAX_RATE = 0.13;
 
@@ -130,6 +132,7 @@ function Home() {
     <div className="container">
       <Sidebar
         time={time}
+        role={role}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
