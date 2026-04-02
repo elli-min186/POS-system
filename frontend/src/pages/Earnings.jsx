@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import "../css/home.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 

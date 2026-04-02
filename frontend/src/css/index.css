@@ -102,6 +102,51 @@ svg {
     padding: 32px;
 }
 
+/* --- HOME & INVOICES SHARED UI FOR RIGHT COL --- */
+.order-total-section {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: var(--text-grey);
+    font-size: 0.9rem;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    margin: 15px 0;
+}
+
+.submit-btn {
+    width: 100%;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.submit-btn:hover {
+    background: #2563eb;
+}
+
 /* --- SIDEBAR & NAVIGATION --- */
 .logo-area {
     display: flex;

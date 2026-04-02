@@ -230,7 +230,7 @@ function Home() {
             <span>${total.toFixed(2)}</span>
           </div>
 
-          <button className="checkout-btn" onClick={handleCheckout}>
+          <button className="submit-btn" onClick={handleCheckout}>
             Complete Payment
           </button>
         </div>

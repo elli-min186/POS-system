@@ -243,7 +243,8 @@ app.post("/api/invoices", async (req, res) => {
 
     // Find last invoice
     const lastInvoice = await Invoice.findOne().sort({ invoice_id: -1 });
-    const newId = lastInvoice && lastInvoice.invoice_id ? lastInvoice.invoice_id + 1 : 1001;
+    const newId =
+      lastInvoice && lastInvoice.invoice_id ? lastInvoice.invoice_id + 1 : 1001;
 
     const newInvoice = new Invoice({
       invoice_id: newId,
@@ -251,7 +252,7 @@ app.post("/api/invoices", async (req, res) => {
       subtotal: Number(Number(subtotal).toFixed(2)),
       tax: Number(Number(tax).toFixed(2)),
       total: Number(Number(total).toFixed(2)),
-      date: date || new Date()
+      date: date || new Date(),
     });
 
     // Save to DB
@@ -288,6 +289,85 @@ app.get("/api/invoices", async (req, res) => {
     res.status(500).json({
       error: "Failed to fetch invoices",
     });
+  }
+});
+
+// Process a refund for an invoice
+app.post("/api/invoices/:id/refund", async (req, res) => {
+  // Convert URL param to a Number to match your invoice_id schema
+  const invoiceId = Number(req.params.id);
+  const { itemsToRefund } = req.body;
+
+  try {
+    // 1. Fetch the invoice first
+    const invoice = await Invoice.findOne({ invoice_id: invoiceId });
+
+    if (!invoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    // 2. Loop through the refund request and update the items array in memory
+    for (const refundItem of itemsToRefund) {
+      const targetId = Number(refundItem.id);
+      const refundQty = Number(refundItem.qty);
+
+      // Find the item in the invoice array
+      const itemIndex = invoice.items.findIndex(
+        (item) => Number(item.product_id) === targetId,
+      );
+
+      if (itemIndex > -1) {
+        // Ensure we are adding to the existing refunded amount
+        const currentRefunded = Number(
+          invoice.items[itemIndex].refunded_quantity || 0,
+        );
+        const maxAllowed = Number(invoice.items[itemIndex].quantity);
+
+        // Safety check: Don't allow refunding more than was bought
+        const newRefundTotal = Math.min(
+          currentRefunded + refundQty,
+          maxAllowed,
+        );
+
+        invoice.items[itemIndex].refunded_quantity = newRefundTotal;
+
+        // Update Product Stock
+        await Products.updateOne(
+          { product_id: targetId },
+          { $inc: { stock_quantity: refundQty } },
+        );
+      }
+    }
+
+    // 3. IMPORTANT: Force Mongoose to see the change in the Mixed Array
+    invoice.markModified("items");
+
+    // 4. Recalculate the overall status
+    let totalBought = 0;
+    let totalRefunded = 0;
+
+    invoice.items.forEach((item) => {
+      totalBought += item.quantity;
+      totalRefunded += item.refunded_quantity || 0;
+    });
+
+    if (totalRefunded >= totalBought) {
+      invoice.status = "Fully Refunded";
+    } else if (totalRefunded > 0) {
+      invoice.status = "Partially Refunded";
+    }
+
+    // 5. Save everything to the database
+    await invoice.save();
+
+    // 6. Send the updated invoice back to the frontend
+    res.status(200).json({
+      message: "Refund processed successfully",
+      invoice: invoice,
+    });
+  } catch (error) {
+    console.error("Refund Error:", error);
+    res.status(500).json({ error: "Failed to process refund." });
   }
 });
 

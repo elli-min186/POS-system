@@ -299,5 +299,46 @@
     "tax": 52.00,
     "total": 451.97,
     "date": "2026-04-02T11:45:00Z"
+  },
+  {
+    "invoice_id": "8042",
+    "date": "2026-03-01T14:30:00Z",
+    "status": "Paid",
+    "subtotal": 1099.00,
+    "tax": 142.87,
+    "total": 1241.87,
+    "items": [
+      {
+        "product_id": "prod_macbook_air",
+        "name": "MacBook Air (M2)",
+        "price": 1099.00,
+        "quantity": 1,
+        "refunded": false
+      }
+    ]
+  },
+  {
+    "invoice_id": "7911",
+    "date": "2026-02-14T09:15:00Z",
+    "status": "Paid",
+    "subtotal": 149.97,
+    "tax": 19.50,
+    "total": 169.47,
+    "items": [
+      {
+        "product_id": "prod_airtag_4pack",
+        "name": "Apple AirTag 4-Pack",
+        "price": 99.98,
+        "quantity": 1,
+        "refunded": false
+      },
+      {
+        "product_id": "prod_magsafe_case",
+        "name": "iPhone 15 Clear Case with MagSafe",
+        "price": 49.99,
+        "quantity": 1,
+        "refunded": false
+      }
+    ]
   }
 ]
