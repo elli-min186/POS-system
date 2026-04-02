@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import "../css/invoices.css" // Assumes you kept the merged CSS
+import "../css/invoices.css" 
 
 function Invoices() {
   const [invoices, setInvoices] = useState([]);
@@ -9,6 +9,9 @@ function Invoices() {
 
   // State to track the quantity selected in the dropdown for each specific product
   const [refundQuantities, setRefundQuantities] = useState({});
+  
+  // State for sorting the table
+  const [sortConfig, setSortConfig] = useState(null);
 
   // Fetch all invoices from the backend on component mount
   useEffect(() => {
@@ -44,13 +47,10 @@ function Invoices() {
       const data = await response.json();
 
       if (response.ok) {
-        // Backend returns the updated invoice object
         setSelectedInvoice(data.invoice);
-        // Update the invoice list so the status badges change immediately
         setInvoices((prev) =>
           prev.map((inv) => inv.invoice_id === invoiceId ? data.invoice : inv)
         );
-        // Reset dropdown quantities to 1 for the next interaction
         setRefundQuantities({});
       } else {
         alert(data.error || "Failed to process refund");
@@ -60,17 +60,62 @@ function Invoices() {
     }
   };
 
-  // Dynamic CSS classes based on the invoice status string
   const getStatusClass = (status) => {
     if (status === "Fully Refunded") return "status-refunded";
     if (status === "Partially Refunded") return "status-partial";
     return "status-paid";
   };
 
-  // Update specific product's refund quantity in state when dropdown changes
   const handleQtyChange = (productId, val) => {
     setRefundQuantities(prev => ({ ...prev, [productId]: parseInt(val) }));
   };
+
+  // Sorting Handler
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Helper to render sort arrows
+  const getSortIndicator = (key) => {
+    if (!sortConfig || sortConfig.key !== key) return " ↕";
+    return sortConfig.direction === 'asc' ? " ↑" : " ↓";
+  };
+
+  // Create a sorted copy of the invoices array
+  const sortedInvoices = [...invoices].sort((a, b) => {
+    if (!sortConfig) return 0;
+
+    let aVal, bVal;
+
+    switch (sortConfig.key) {
+      case 'invoice_id':
+        aVal = a.invoice_id;
+        bVal = b.invoice_id;
+        break;
+      case 'date':
+        aVal = new Date(a.date || a.createdAt).getTime();
+        bVal = new Date(b.date || b.createdAt).getTime();
+        break;
+      case 'status':
+        aVal = a.status || "Paid";
+        bVal = b.status || "Paid";
+        break;
+      case 'total':
+        aVal = Number(a.total);
+        bVal = Number(b.total);
+        break;
+      default:
+        return 0;
+    }
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   return (
     <div className="container">
@@ -91,18 +136,26 @@ function Invoices() {
             <table className="shared-table">
               <thead>
                 <tr>
-                  <th>Invoice ID</th>
-                  <th>Date</th>
-                  <th>Status</th>
+                  <th onClick={() => handleSort('invoice_id')} style={{cursor: 'pointer', userSelect: 'none'}}>
+                    Invoice ID{getSortIndicator('invoice_id')}
+                  </th>
+                  <th onClick={() => handleSort('date')} style={{cursor: 'pointer', userSelect: 'none'}}>
+                    Date{getSortIndicator('date')}
+                  </th>
+                  <th onClick={() => handleSort('status')} style={{cursor: 'pointer', userSelect: 'none'}}>
+                    Status{getSortIndicator('status')}
+                  </th>
                   <th>Total Items</th>
-                  <th>Total Paid</th>
+                  <th onClick={() => handleSort('total')} style={{cursor: 'pointer', userSelect: 'none'}}>
+                    Total Paid{getSortIndicator('total')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {invoices.length === 0 ? (
+                {sortedInvoices.length === 0 ? (
                   <tr><td colSpan="5" className="empty-shared">No invoices found.</td></tr>
                 ) : (
-                  invoices.map((inv) => (
+                  sortedInvoices.map((inv) => (
                     <tr
                       key={inv._id || inv.invoice_id}
                       onClick={() => setSelectedInvoice(inv)}
@@ -134,7 +187,6 @@ function Invoices() {
           )}
         </div>
 
-        {/* 1. SCROLLABLE AREA: Only the items go in here */}
         <div className="order-list">
           {!selectedInvoice ? (
             <div className="empty-shared">Select an invoice to view details.</div>
@@ -207,7 +259,6 @@ function Invoices() {
           )}
         </div>
 
-        {/* 2. STICKY BOTTOM AREA: Sits outside the scrollable list, rendered conditionally */}
         {selectedInvoice && (
           <div className="invoice-totals">
             {(() => {
@@ -217,14 +268,12 @@ function Invoices() {
               const originalTax = originalSubtotal * 0.13;
               const originalTotal = originalSubtotal + originalTax;
 
-              // REFUND MATH
               const refundedSubtotal = selectedInvoice.items.reduce((sum, item) => {
                 return sum + (item.price * (item.refunded_quantity || 0));
               }, 0);
               const refundedTax = refundedSubtotal * 0.13;
               const totalRefunded = refundedSubtotal + refundedTax;
 
-              // FINAL BALANCE
               const currentTotal = Math.max(0, originalTotal - totalRefunded);
 
               return (
@@ -248,7 +297,6 @@ function Invoices() {
                     <span>${currentTotal.toFixed(2)}</span>
                   </div>
                   
-                  {/* Show "Refund Entire Invoice" only if there are items left to refund */}
                   {isRefundable(selectedInvoice.date) &&
                     selectedInvoice.items.some(item => item.quantity > (item.refunded_quantity || 0)) && (
                       <button
