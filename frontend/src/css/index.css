@@ -104,6 +104,7 @@ svg {
 
 /* --- HOME & INVOICES SHARED UI FOR RIGHT COL --- */
 .order-total-section {
+    z-index: 10;
     padding: 20px;
     border-top: 1px solid var(--border);
     background: #f8fafc;
@@ -455,6 +456,7 @@ svg {
     border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
+    height: 100vh;
 }
 
 .order-header {

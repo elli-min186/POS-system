@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import "../css/invoices.css"
+import "../css/invoices.css" // Assumes you kept the merged CSS
 
 function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  
+
   // State to track the quantity selected in the dropdown for each specific product
   const [refundQuantities, setRefundQuantities] = useState({});
 
@@ -134,7 +134,8 @@ function Invoices() {
           )}
         </div>
 
-        <div className="order-list invoice-details-content">
+        {/* 1. SCROLLABLE AREA: Only the items go in here */}
+        <div className="order-list">
           {!selectedInvoice ? (
             <div className="empty-shared">Select an invoice to view details.</div>
           ) : (
@@ -148,11 +149,10 @@ function Invoices() {
                 <div className="warning-box">Past 14-day return window. No refunds allowed.</div>
               )}
 
-              <div className="order-list invoice-items-wrapper">
+              <div className="invoice-items-wrapper">
                 {selectedInvoice.items.map(item => {
                   const refundedQty = item.refunded_quantity || 0;
                   const remainingQty = item.quantity - refundedQty;
-                  // Get selected qty from state, default to 1
                   const selectedQty = refundQuantities[item.product_id] || 1;
 
                   return (
@@ -161,7 +161,6 @@ function Invoices() {
                         <h4 className="invoice-item-title">{item.name}</h4>
                         <p className="item-meta">
                           {item.quantity} x ${item.price.toFixed(2)}
-                          {/* Show remaining count only if a partial refund occurred */}
                           {remainingQty > 0 && remainingQty < item.quantity && (
                             <span className="remaining-qty">
                               ({remainingQty} remaining)
@@ -176,7 +175,6 @@ function Invoices() {
                       </div>
 
                       <div className="invoice-item-actions">
-                        {/* Show Refund UI if items are left and date is valid */}
                         {remainingQty > 0 && isRefundable(selectedInvoice.date) ? (
                           <div className="refund-action-group">
                             {remainingQty > 1 && (
@@ -205,70 +203,73 @@ function Invoices() {
                   );
                 })}
               </div>
-
-              <div className="invoice-totals">
-                {(() => {
-                  const originalSubtotal = selectedInvoice.items.reduce((sum, item) => {
-                    return sum + (item.price * item.quantity);
-                  }, 0);
-                  const originalTax = originalSubtotal * 0.13;
-                  const originalTotal = originalSubtotal + originalTax;
-
-                  // REFUND MATH (Based on items returned)
-                  const refundedSubtotal = selectedInvoice.items.reduce((sum, item) => {
-                    return sum + (item.price * (item.refunded_quantity || 0));
-                  }, 0);
-                  const refundedTax = refundedSubtotal * 0.13;
-                  const totalRefunded = refundedSubtotal + refundedTax;
-
-                  // FINAL BALANCE
-                  const currentTotal = Math.max(0, originalTotal - totalRefunded);
-
-                  return (
-                    <div className="order-total-section">
-                      <div className="row">
-                        <span>Subtotal</span>
-                        <span>${originalSubtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="row">
-                        <span>Tax (13%)</span>
-                        <span>${originalTax.toFixed(2)}</span>
-                      </div>
-                      {totalRefunded > 0 && (
-                        <div className="row text-danger">
-                          <span>Total Refunded (Incl. Tax)</span>
-                          <span>-${totalRefunded.toFixed(2)}</span>
-                        </div>
-                      )}
-                      <div className="total-row">
-                        <span>Current Total</span>
-                        <span>${currentTotal.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Show "Refund Entire Invoice" only if there are items left to refund */}
-                {isRefundable(selectedInvoice.date) &&
-                  selectedInvoice.items.some(item => item.quantity > (item.refunded_quantity || 0)) && (
-                    <button
-                      onClick={() => {
-                        const allRemaining = selectedInvoice.items
-                          .filter(item => item.quantity > (item.refunded_quantity || 0))
-                          .map(item => ({
-                            id: item.product_id,
-                            qty: item.quantity - (item.refunded_quantity || 0)
-                          }));
-                        processRefund(selectedInvoice.invoice_id, allRemaining);
-                      }}
-                      className="submit-btn">
-                      Refund Entire Invoice
-                    </button>
-                  )}
-              </div>
             </>
           )}
         </div>
+
+        {/* 2. STICKY BOTTOM AREA: Sits outside the scrollable list, rendered conditionally */}
+        {selectedInvoice && (
+          <div className="invoice-totals">
+            {(() => {
+              const originalSubtotal = selectedInvoice.items.reduce((sum, item) => {
+                return sum + (item.price * item.quantity);
+              }, 0);
+              const originalTax = originalSubtotal * 0.13;
+              const originalTotal = originalSubtotal + originalTax;
+
+              // REFUND MATH
+              const refundedSubtotal = selectedInvoice.items.reduce((sum, item) => {
+                return sum + (item.price * (item.refunded_quantity || 0));
+              }, 0);
+              const refundedTax = refundedSubtotal * 0.13;
+              const totalRefunded = refundedSubtotal + refundedTax;
+
+              // FINAL BALANCE
+              const currentTotal = Math.max(0, originalTotal - totalRefunded);
+
+              return (
+                <div className="order-total-section">
+                  <div className="row">
+                    <span>Subtotal</span>
+                    <span>${originalSubtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="row">
+                    <span>Tax (13%)</span>
+                    <span>${originalTax.toFixed(2)}</span>
+                  </div>
+                  {totalRefunded > 0 && (
+                    <div className="row text-danger">
+                      <span>Total Refunded (Incl. Tax)</span>
+                      <span>-${totalRefunded.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="total-row">
+                    <span>Current Total</span>
+                    <span>${currentTotal.toFixed(2)}</span>
+                  </div>
+                  
+                  {/* Show "Refund Entire Invoice" only if there are items left to refund */}
+                  {isRefundable(selectedInvoice.date) &&
+                    selectedInvoice.items.some(item => item.quantity > (item.refunded_quantity || 0)) && (
+                      <button
+                        onClick={() => {
+                          const allRemaining = selectedInvoice.items
+                            .filter(item => item.quantity > (item.refunded_quantity || 0))
+                            .map(item => ({
+                              id: item.product_id,
+                              qty: item.quantity - (item.refunded_quantity || 0)
+                            }));
+                          processRefund(selectedInvoice.invoice_id, allRemaining);
+                        }}
+                        className="submit-btn" style={{marginTop: "15px"}}>
+                        Refund Entire Invoice
+                      </button>
+                    )}
+                </div>
+              );
+            })()}
+          </div>
+        )}
       </aside>
     </div>
   );

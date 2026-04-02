@@ -344,7 +344,7 @@ function Inventory() {
           onSearchChange={(e) => setSearchTerm(e.target.value)}
           rightAction={
             <button
-              className="checkout-btn inventory-add-btn"
+              className="submit-btn inventory-add-btn"
               onClick={() => setShowModal(true)}
               type="button"
             >
@@ -375,8 +375,9 @@ function Inventory() {
           <>
             <div className="order-header">
               <h3>Edit Product</h3>
-              <button onClick={handleClosePanel} className="close-btn">
-                x
+
+              <button className="clear-cart-btn" onClick={handleClosePanel}>
+                Close
               </button>
             </div>
 
@@ -480,7 +481,7 @@ function Inventory() {
 
             <div className="order-total-section">
               <button
-                className="checkout-btn"
+                className="submit-btn"
                 type="button"
                 onClick={updateItem}
               >
