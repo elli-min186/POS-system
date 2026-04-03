@@ -3,41 +3,59 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 function Earnings() {
-  const [products, setProducts] = useState([]);
-  const [sales, setSales] = useState([]);
+  const [invoices, setInvoices] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/items")
-      .then((res) => res.json())
-      .then((data) => setProducts(Array.isArray(data) ? data : []))
-      .catch((err) => console.error("Error fetching products:", err));
-
-    fetch("http://localhost:8080/api/sales")
-      .then((res) => res.json())
-      .then((data) => setSales(Array.isArray(data) ? data : []))
-      .catch((err) => console.error("Error fetching sales:", err));
+  fetch("http://localhost:8080/api/invoices")
+    .then((res) => res.json())
+    .then((data) => setInvoices(Array.isArray(data) ? data : []))
+    .catch((err) => console.error("Error fetching invoices:", err));
   }, []);
 
 
   const earningsRows = useMemo(() => {
-    return products.map((product) => {
-      const sale = sales.find((s) => s.item === product.name) || { quantity: 0 };
-      const unitsSold = sale.quantity || 0;
-      const revenue = +(unitsSold * Number(product.price)).toFixed(2);
+  const map = {};
 
-      return {
-        id: product.product_id ?? product._id,
-        name: product.name,
-        sku: product.sku || "N/A",
-        unitsSold,
-        price: Number(product.price),
-        total: revenue,
-      };
+  invoices.forEach((inv) => {
+    inv.items?.forEach((item) => {
+      const key = item.product_id;
+
+      if (!map[key]) {
+        map[key] = {
+          id: key,
+          name: item.name,
+          sku: item.sku || "N/A",
+          unitsSold: 0,
+          price: Number(item.price),
+          total: 0,
+        };
+      }
+
+      const refunded = item.refunded_quantity || 0;
+      const actualSold = item.quantity - refunded;
+
+      map[key].unitsSold += actualSold;
+      map[key].total += actualSold * item.price;
     });
-  }, [products, sales]);
+  });
+
+  return Object.values(map);
+  }, [invoices]);
 
   const totalRevenue = useMemo(() => {
     return earningsRows.reduce((sum, row) => sum + row.total, 0);
+  }, [earningsRows]);
+
+  const totalUnitsSold = useMemo(() => {
+  return earningsRows.reduce((sum, row) => sum + row.unitsSold, 0);
+  }, [earningsRows]);
+
+  const bestSeller = useMemo(() => {
+    return [...earningsRows].sort((a, b) => b.unitsSold - a.unitsSold)[0];
+  }, [earningsRows]);
+
+  const topRevenueItem = useMemo(() => {
+    return [...earningsRows].sort((a, b) => b.total - a.total)[0];
   }, [earningsRows]);
 
   return (
@@ -53,6 +71,13 @@ function Earnings() {
           titleId="page-title"
           tagText={`$${totalRevenue.toFixed(2)} Total Revenue`}
           tagId="total-revenue"
+          extraTags={[
+            `${totalUnitsSold} Units`,
+            bestSeller ? `Best: ${bestSeller.name}` : "Best: N/A",
+            topRevenueItem
+              ? `Top: $${topRevenueItem.total.toFixed(2)}`
+              : "Top: N/A",
+          ]}
         />
 
         <div className="shared-table-wrapper">

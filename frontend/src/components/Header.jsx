@@ -8,17 +8,26 @@ function Header({
   onSearchChange,
   searchPlaceholder = "Search...",
   searchClass = "",
-  rightAction = null 
+  rightAction = null,
+  extraTags = []
 }) {
   return (
     <header className="top-bar">
       <div className="header-left">
         <h1 id={titleId}>{title}</h1>
-        {tagText && (
-          <span className="tag" id={tagId}>
-            {tagText}
-          </span>
-        )}
+
+        <div className="header-tags">
+          {tagText && (
+            <span className="tag" id={tagId}>
+              {tagText}
+            </span>
+          )}
+          {extraTags.map((text, index) => (
+            <span className="tag" key={index}>
+              {text}
+            </span>
+          ))}
+        </div>
       </div>
 
       {showSearch && (

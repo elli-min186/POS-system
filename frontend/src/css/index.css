@@ -578,6 +578,20 @@ svg {
     background: #f8fafc;
 }
 
+.earnings-tags {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.header-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: 10px;
+}
+
 /* --- ANIMATIONS --- */
 @keyframes popup {
     from {
@@ -602,3 +616,4 @@ svg {
         transform: translateY(0);
     }
 }
+
