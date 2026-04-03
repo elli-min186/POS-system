@@ -22,6 +22,8 @@ import Sidebar from "../components/Sidebar";
 import "../css/home.css";
 import Header from "../components/Header";
 
+const role = localStorage.getItem("role") || "worker";
+
 function Home() {
   const TAX_RATE = 0.13;
 
@@ -143,6 +145,8 @@ function Home() {
   return (
     <div className="container">
       <Sidebar
+        time={time}
+        role={role}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}

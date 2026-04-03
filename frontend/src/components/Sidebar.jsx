@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function Sidebar({
+  role = "worker",
+  time,
   showCategories = false,
   categories = [],
   selectedCategory = "all",
@@ -39,6 +41,11 @@ function Sidebar({
       <div>
         <div className="logo-area">
           <div className="logo-icon">
+            {activePage === "home" ? (
+              <ShoppingCart size={20} />
+            ) : (
+              <Store size={20} />
+            )}
             <Store size={20} />
           </div>
 
@@ -72,6 +79,7 @@ function Sidebar({
         <h3>NAVIGATION</h3>
 
         <ul>
+          {/* Home (everyone) */}
           <li className={activePage === "home" ? "active" : ""}>
             <Link to="/" className="nav-link">
               <LayoutGrid size={18} />
@@ -79,13 +87,7 @@ function Sidebar({
             </Link>
           </li>
 
-          <li className={activePage === "earnings" ? "active" : ""}>
-            <Link to="/earnings" className="nav-link">
-              <DollarSign size={18} />
-              Earnings
-            </Link>
-          </li>
-
+          {/* Inventory (everyone) */}
           <li className={activePage === "inventory" ? "active" : ""}>
             <Link to="/inventory" className="nav-link">
               <Boxes size={18} />
@@ -93,6 +95,15 @@ function Sidebar({
             </Link>
           </li>
 
+          {/* Earnings (OWNER ONLY) */}
+          {role === "owner" && (
+            <li className={activePage === "earnings" ? "active" : ""}>
+              <Link to="/earnings" className="nav-link">
+                <DollarSign size={18} />
+                Earnings
+              </Link>
+            </li>
+          )}
           <li className={activePage === "invoices" ? "active" : ""}>
             <Link to="/invoices" className="nav-link">
               <ReceiptText size={18} />

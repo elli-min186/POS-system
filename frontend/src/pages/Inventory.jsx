@@ -44,6 +44,9 @@ function Inventory() {
     description: ""
   });
 
+  const role = localStorage.getItem("role") || "worker"; // fallback for testing
+  const isReadOnly = role === "worker";
+  
   const [newProduct, setNewProduct] = useState({
     name: "",
     brand: "",
@@ -122,6 +125,7 @@ function Inventory() {
   };
 
   const confirmDeleteItem = async (id) => {
+    if (isReadOnly) return;
     try {
       const response = await fetch(`http://localhost:8080/api/items/${id}`, {
         method: "DELETE"
@@ -218,6 +222,7 @@ function Inventory() {
 
   const addProduct = async (e) => {
     e.preventDefault();
+    if (isReadOnly) return;
 
     const generatedSku = generateSku(
       newProduct.brand,
@@ -275,6 +280,7 @@ function Inventory() {
   };
 
   const updateItem = async () => {
+    if (isReadOnly) return;
     if (!selectedItem) return;
 
     try {
@@ -327,6 +333,8 @@ function Inventory() {
   return (
     <div className="container">
       <Sidebar
+        role={role}
+        time={time}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
@@ -335,6 +343,23 @@ function Inventory() {
       />
 
       <main className="main-content">
+        <header className="top-bar">
+          <div className="header-left">
+            <h1>Inventory</h1>
+            <span className="tag">{filteredItems.length} items</span>
+          </div>
+
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search inventory..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="header-right">
+            {!isReadOnly && (
         <Header
           title="Inventory"
           tagText={`${filteredItems.length} items`}
@@ -351,6 +376,9 @@ function Inventory() {
               <Plus size={18} />
               Add New Product
             </button>
+            )}
+          </div>
+        </header>
           }
         />
 
@@ -363,7 +391,11 @@ function Inventory() {
                 key={item.product_id}
                 item={item}
                 onClick={() => handleSelectItem(item)}
-                onDelete={(id, name) => setItemToDelete({ id, name })}
+                onDelete={
+                  !isReadOnly
+                    ? (id, name) => setItemToDelete({ id, name })
+                    : null
+                }
               />
             ))}
           </div>
@@ -398,6 +430,7 @@ function Inventory() {
                   name="name"
                   value={editForm.name}
                   onChange={handleEditChange}
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -408,6 +441,7 @@ function Inventory() {
                   name="brand"
                   value={editForm.brand}
                   onChange={handleEditChange}
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -417,6 +451,7 @@ function Inventory() {
                   name="category"
                   value={editForm.category}
                   onChange={handleEditChange}
+                  disabled={isReadOnly}
                 >
                   {inventoryCategories.map((cat) => (
                     <option key={cat.name} value={cat.name}>
@@ -433,6 +468,7 @@ function Inventory() {
                   name="storage"
                   value={editForm.storage}
                   onChange={handleEditChange}
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -443,6 +479,7 @@ function Inventory() {
                   name="color"
                   value={editForm.color}
                   onChange={handleEditChange}
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -454,6 +491,7 @@ function Inventory() {
                   value={editForm.price}
                   onChange={handleEditChange}
                   step="0.01"
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -465,6 +503,7 @@ function Inventory() {
                   value={editForm.stock_quantity}
                   onChange={handleEditChange}
                   min="0"
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -475,11 +514,13 @@ function Inventory() {
                   value={editForm.description}
                   onChange={handleEditChange}
                   rows="4"
+                  disabled={isReadOnly}
                 />
               </div>
             </div>
 
             <div className="order-total-section">
+              {!isReadOnly && (
               <button
                 className="submit-btn"
                 type="button"
@@ -487,6 +528,7 @@ function Inventory() {
               >
                 Save Changes
               </button>
+              )}
             </div>
           </>
         ) : (
@@ -686,7 +728,8 @@ function Inventory() {
               >
                 Cancel
               </button>
-
+              
+              {!isReadOnly && (
               <button
                 type="button"
                 className="submit-btn delete-confirm-btn"
@@ -694,6 +737,7 @@ function Inventory() {
               >
                 Delete
               </button>
+              )}
             </div>
           </div>
         </div>
