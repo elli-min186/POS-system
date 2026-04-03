@@ -145,7 +145,6 @@ function Home() {
   return (
     <div className="container">
       <Sidebar
-        time={time}
         role={role}
         showCategories={true}
         categories={categories}

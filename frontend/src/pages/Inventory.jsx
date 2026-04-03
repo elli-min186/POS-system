@@ -334,7 +334,6 @@ function Inventory() {
     <div className="container">
       <Sidebar
         role={role}
-        time={time}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
@@ -360,27 +359,27 @@ function Inventory() {
 
           <div className="header-right">
             {!isReadOnly && (
-        <Header
-          title="Inventory"
-          tagText={`${filteredItems.length} items`}
-          showSearch={true}
-          searchPlaceholder="Search inventory..."
-          searchValue={searchTerm}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
-          rightAction={
-            <button
-              className="submit-btn inventory-add-btn"
-              onClick={() => setShowModal(true)}
-              type="button"
-            >
-              <Plus size={18} />
-              Add New Product
-            </button>
+              <Header
+                title="Inventory"
+                tagText={`${filteredItems.length} items`}
+                showSearch={true}
+                searchPlaceholder="Search inventory..."
+                searchValue={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                rightAction={
+                  <button
+                    className="submit-btn inventory-add-btn"
+                    onClick={() => setShowModal(true)}
+                    type="button"
+                  >
+                    <Plus size={18} />
+                    Add New Product
+                  </button>
+                }
+              />
             )}
           </div>
         </header>
-          }
-        />
 
         {loading ? (
           <p>Loading inventory...</p>

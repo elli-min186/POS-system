@@ -3,14 +3,14 @@ import {
   LayoutGrid,
   DollarSign,
   Boxes,
-  ReceiptText
+  ReceiptText,
+  ShoppingCart
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function Sidebar({
   role = "worker",
-  time,
   showCategories = false,
   categories = [],
   selectedCategory = "all",
