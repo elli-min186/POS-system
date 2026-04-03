@@ -34,13 +34,18 @@ function Home() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const fetchItems = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/api/items");
+    const data = await res.json();
+    setAllProducts(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error(err);
+  }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:8080/api/items")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllProducts(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => console.error(err));
+  fetchItems();
   }, []);
 
   useEffect(() => {
@@ -126,15 +131,22 @@ function Home() {
         body: JSON.stringify(invoiceData),
       });
 
-      if (response.ok) {
-        alert("Payment successful! Invoice created.");
-        clearCart(); // Clear the cart after a successful order
-      } else {
-        alert("Failed to create invoice.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || "Checkout failed");
+        return;
       }
+
+      //success
+      alert("Payment successful! Invoice created.");
+      clearCart();
+
+      await fetchItems(); // refresh only if success
+      
     } catch (err) {
       console.error("Checkout error:", err);
     }
+    
   };
 
   const categories = [

@@ -255,17 +255,34 @@ app.post("/api/invoices", async (req, res) => {
       date: date || new Date(),
     });
 
+    // Deduct inventory safely
+    for (let item of items) {
+      const product = await Products.findOne({ product_id: item.product_id });
+
+      if (!product) {
+        return res.status(404).json({
+          error: "Product not found",
+        });
+      }
+
+      if (item.quantity > product.stock_quantity) {
+        return res.status(400).json({
+          error: `${product.name} does not have enough stock`,
+        });
+      }
+    }
+
+    // Only if valid then update
+    for (let item of items) {
+      await Products.updateOne(
+        { product_id: item.product_id },
+        { $inc: { stock_quantity: -item.quantity } }
+      );
+    }
+
     // Save to DB
     await newInvoice.save();
     console.log(`Invoice created successfully! Total: $${total}`);
-
-    // Deduct inventory
-    for (let item of items) {
-      await Products.findOneAndUpdate(
-        { product_id: item.product_id },
-        { $inc: { stock_quantity: -item.quantity } },
-      );
-    }
 
     // 4. Send success response back to frontend
     res.status(201).json(newInvoice);
