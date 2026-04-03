@@ -21,7 +21,6 @@ import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
 import "../css/home.css";
 import Header from "../components/Header";
-import { Navigate } from "react-router-dom";
 
 const role = localStorage.getItem("role") || "worker";
 
@@ -68,6 +67,12 @@ function Home() {
       (item) => item.product_id === product.product_id
     );
 
+    const currentQty = existing ? existing.quantity : 0;
+
+    if (currentQty >= product.stock_quantity) {
+      alert("Not enough stock available");
+      return;
+    }
     if (existing) {
       setCart(
         cart.map((item) =>
@@ -98,6 +103,13 @@ function Home() {
 
   const handleCheckout = async () => {
     if (cart.length === 0) return alert("Cart is empty!");
+
+    for (let item of cart) {
+      if (item.quantity > item.stock_quantity) {
+        alert(`${item.name} is out of stock`);
+        return;
+      }
+    }
 
     const invoiceData = {
       items: cart,

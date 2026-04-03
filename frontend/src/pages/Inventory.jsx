@@ -24,6 +24,7 @@ import Header from "../components/Header";
 import { Navigate } from "react-router-dom";
 
 function Inventory() {
+  // inventory list + UI state
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -45,14 +46,12 @@ function Inventory() {
     description: ""
   });
 
+  // Role-based access (workers cannot access inventory page)
   const role = localStorage.getItem("role") || "worker"; // fallback for testing
   const isReadOnly = role === "worker";
     if (role === "worker") {
     return <Navigate to="/" replace />;
   }
-
-  const isManager = role === "manager";
-  const isOwner = role === "owner";
 
   
   const [newProduct, setNewProduct] = useState({
@@ -66,6 +65,7 @@ function Inventory() {
     description: ""
   });
 
+// Fetch inventory items from backend once on mount
   useEffect(() => {
     fetchItems();
   }, []);
@@ -228,6 +228,7 @@ function Inventory() {
       : `${skuBrand}-${skuModel}-${skuColor}`;
   };
 
+  // Add new inventory item to backend and refresh local list state
   const addProduct = async (e) => {
     e.preventDefault();
     if (isReadOnly) return;
@@ -238,6 +239,16 @@ function Inventory() {
       newProduct.storage,
       newProduct.color
     );
+
+    if (Number(newProduct.price) <= 0) {
+      alert("Price cannot be negative");
+      return;
+    }
+
+    if (Number(newProduct.stock_quantity) <= 0) {
+      alert("Stock cannot be negative");
+      return;
+    }
 
     const productToSend = {
       sku: generatedSku,
@@ -288,6 +299,16 @@ function Inventory() {
   };
 
   const updateItem = async () => {
+    if (Number(editForm.price) < 0) {
+      alert("Price cannot be negative");
+      return;
+    }
+
+    if (Number(editForm.stock_quantity) < 0) {
+      alert("Stock cannot be negative");
+      return;
+    }
+
     if (isReadOnly) return;
     if (!selectedItem) return;
 

@@ -4,14 +4,17 @@ import Header from "../components/Header";
 import { Navigate } from "react-router-dom";
 
 function Earnings() {
+  // invoices state
   const [invoices, setInvoices] = useState([]);
 
+  // owner-only page
   const role = localStorage.getItem("role") || "worker";
 
   if (role !== "owner") {
   return <Navigate to="/" replace />;
   }
 
+  // fetch invoices once
   useEffect(() => {
   fetch("http://localhost:8080/api/invoices")
     .then((res) => res.json())
@@ -20,6 +23,7 @@ function Earnings() {
   }, []);
 
 
+  // aggregate items by product
   const earningsRows = useMemo(() => {
   const map = {};
 
