@@ -21,6 +21,7 @@ import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
 import "../css/inventory.css";
 import Header from "../components/Header";
+import { Navigate } from "react-router-dom";
 
 function Inventory() {
   const [items, setItems] = useState([]);
@@ -46,6 +47,13 @@ function Inventory() {
 
   const role = localStorage.getItem("role") || "worker"; // fallback for testing
   const isReadOnly = role === "worker";
+    if (role === "worker") {
+    return <Navigate to="/" replace />;
+  }
+
+  const isManager = role === "manager";
+  const isOwner = role === "owner";
+
   
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -333,7 +341,6 @@ function Inventory() {
   return (
     <div className="container">
       <Sidebar
-        role={role}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
@@ -342,44 +349,26 @@ function Inventory() {
       />
 
       <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
-            <h1>Inventory</h1>
-            <span className="tag">{filteredItems.length} items</span>
-          </div>
-
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search inventory..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="header-right">
-            {!isReadOnly && (
-              <Header
-                title="Inventory"
-                tagText={`${filteredItems.length} items`}
-                showSearch={true}
-                searchPlaceholder="Search inventory..."
-                searchValue={searchTerm}
-                onSearchChange={(e) => setSearchTerm(e.target.value)}
-                rightAction={
-                  <button
-                    className="submit-btn inventory-add-btn"
-                    onClick={() => setShowModal(true)}
-                    type="button"
-                  >
-                    <Plus size={18} />
-                    Add New Product
-                  </button>
-                }
-              />
-            )}
-          </div>
-        </header>
+        <Header
+  title="Inventory"
+  tagText={`${filteredItems.length} items`}
+  showSearch={true}
+  searchPlaceholder="Search inventory..."
+  searchValue={searchTerm}
+  onSearchChange={(e) => setSearchTerm(e.target.value)}
+  rightAction={
+    !isReadOnly && (
+      <button
+        className="submit-btn inventory-add-btn"
+        onClick={() => setShowModal(true)}
+        type="button"
+      >
+        <Plus size={18} />
+        Add New Product
+      </button>
+    )
+  }
+/>
 
         {loading ? (
           <p>Loading inventory...</p>

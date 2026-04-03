@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import "../css/invoices.css" 
+import { Navigate } from "react-router-dom";
 
 function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  const role = localStorage.getItem("role") || "worker";
+  if (role === "worker") {
+    return <Navigate to="/" replace />;
+  }
+  const canRefund = role === "manager" || role === "owner";
 
   // State to track the quantity selected in the dropdown for each specific product
   const [refundQuantities, setRefundQuantities] = useState({});
@@ -227,7 +234,7 @@ function Invoices() {
                       </div>
 
                       <div className="invoice-item-actions">
-                        {remainingQty > 0 && isRefundable(selectedInvoice.date) ? (
+                        {remainingQty > 0 && isRefundable(selectedInvoice.date) && canRefund ? (
                           <div className="refund-action-group">
                             {remainingQty > 1 && (
                               <select
@@ -298,6 +305,7 @@ function Invoices() {
                   </div>
                   
                   {isRefundable(selectedInvoice.date) &&
+                  canRefund &&
                     selectedInvoice.items.some(item => item.quantity > (item.refunded_quantity || 0)) && (
                       <button
                         onClick={() => {

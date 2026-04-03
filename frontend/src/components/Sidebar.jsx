@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function Sidebar({
-  role = "worker",
   showCategories = false,
   categories = [],
   selectedCategory = "all",
@@ -18,8 +17,9 @@ function Sidebar({
   activePage = "home"
 }) {
 
-  const [time, setTime] = useState("");
+  const role = localStorage.getItem("role") || "worker";
 
+  const [time, setTime] = useState("");
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
@@ -87,13 +87,25 @@ function Sidebar({
             </Link>
           </li>
 
-          {/* Inventory (everyone) */}
-          <li className={activePage === "inventory" ? "active" : ""}>
-            <Link to="/inventory" className="nav-link">
-              <Boxes size={18} />
-              Inventory
-            </Link>
-          </li>
+          {/* Inventory (Manager + Owner) */}
+          {(role === "manager" || role === "owner") && (
+            <li className={activePage === "inventory" ? "active" : ""}>
+              <Link to="/inventory" className="nav-link">
+                <Boxes size={18} />
+                Inventory
+              </Link>
+            </li>
+          )}
+
+          {/* Invoices (Manager + Owner) */}
+          {(role === "manager" || role === "owner") && (
+            <li className={activePage === "invoices" ? "active" : ""}>
+              <Link to="/invoices" className="nav-link">
+                <ReceiptText size={18} />
+                Invoices
+              </Link>
+            </li>
+          )}
 
           {/* Earnings (OWNER ONLY) */}
           {role === "owner" && (
@@ -104,13 +116,6 @@ function Sidebar({
               </Link>
             </li>
           )}
-          <li className={activePage === "invoices" ? "active" : ""}>
-            <Link to="/invoices" className="nav-link">
-              <ReceiptText size={18} />
-              Invoices
-            </Link>
-          </li>
-
         </ul>
       </div>
     </aside>

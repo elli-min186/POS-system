@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import { Navigate } from "react-router-dom";
 
 function Earnings() {
   const [invoices, setInvoices] = useState([]);
+
+  const role = localStorage.getItem("role") || "worker";
+
+  if (role !== "owner") {
+  return <Navigate to="/" replace />;
+  }
 
   useEffect(() => {
   fetch("http://localhost:8080/api/invoices")

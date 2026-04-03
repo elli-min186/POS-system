@@ -21,6 +21,7 @@ import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
 import "../css/home.css";
 import Header from "../components/Header";
+import { Navigate } from "react-router-dom";
 
 const role = localStorage.getItem("role") || "worker";
 
@@ -145,7 +146,6 @@ function Home() {
   return (
     <div className="container">
       <Sidebar
-        role={role}
         showCategories={true}
         categories={categories}
         selectedCategory={selectedCategory}
