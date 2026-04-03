@@ -1,11 +1,12 @@
 import {
-  ShoppingCart,
   Store,
   LayoutGrid,
   DollarSign,
-  Boxes
+  Boxes,
+  ReceiptText
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function Sidebar({
   role = "worker",
@@ -13,9 +14,28 @@ function Sidebar({
   showCategories = false,
   categories = [],
   selectedCategory = "all",
-  onCategoryChange = () => {},
+  onCategoryChange = () => { },
   activePage = "home"
 }) {
+
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setTime(
+        now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    };
+
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <aside className="sidebar">
       <div>
@@ -26,6 +46,7 @@ function Sidebar({
             ) : (
               <Store size={20} />
             )}
+            <Store size={20} />
           </div>
 
           <div>
@@ -83,6 +104,13 @@ function Sidebar({
               </Link>
             </li>
           )}
+          <li className={activePage === "invoices" ? "active" : ""}>
+            <Link to="/invoices" className="nav-link">
+              <ReceiptText size={18} />
+              Invoices
+            </Link>
+          </li>
+
         </ul>
       </div>
     </aside>

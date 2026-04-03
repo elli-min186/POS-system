@@ -1,0 +1,344 @@
+[
+  {
+    "invoice_id": 1001,
+    "items": [
+      {
+        "product_id": 2,
+        "name": "iPhone 15 Pro",
+        "price": 1649.99,
+        "quantity": 1,
+        "sku": "APL-IP15PRO-256-NAT"
+      }
+    ],
+    "subtotal": 1649.99,
+    "tax": 214.50,
+    "total": 1864.49,
+    "date": "2026-03-25T10:30:00Z"
+  },
+  {
+    "invoice_id": 1002,
+    "items": [
+      {
+        "product_id": 8,
+        "name": "MacBook Air M2",
+        "price": 1699.99,
+        "quantity": 1,
+        "sku": "APL-MBA-M2-512-GRY"
+      },
+      {
+        "product_id": 13,
+        "name": "AirPods Pro (2nd Generation)",
+        "price": 329.99,
+        "quantity": 2,
+        "sku": "APL-AIRPODSPRO2-WHT"
+      }
+    ],
+    "subtotal": 2359.97,
+    "tax": 306.80,
+    "total": 2666.77,
+    "date": "2026-03-28T14:15:00Z"
+  },
+  {
+    "invoice_id": 1003,
+    "items": [
+      {
+        "product_id": 6,
+        "name": "iPad (10th Generation)",
+        "price": 649.99,
+        "quantity": 1,
+        "sku": "APL-IPAD10-64-BLU"
+      }
+    ],
+    "subtotal": 649.99,
+    "tax": 84.50,
+    "total": 734.49,
+    "date": "2026-04-01T09:45:00Z"
+  },
+  {
+    "invoice_id": 1004,
+    "items": [
+      {
+        "product_id": 5,
+        "name": "Google Pixel 8",
+        "price": 999.99,
+        "quantity": 1,
+        "sku": "GOO-PIXEL8-128-GRY"
+      },
+      {
+        "product_id": 14,
+        "name": "Sony WH-1000XM5",
+        "price": 499.99,
+        "quantity": 1,
+        "sku": "SNY-WH1000XM5-BLK"
+      }
+    ],
+    "subtotal": 1499.98,
+    "tax": 195.00,
+    "total": 1694.98,
+    "date": "2026-04-02T11:20:00Z"
+  },
+  {
+    "invoice_id": 1005,
+    "items": [
+      {
+        "product_id": 20,
+        "name": "Nintendo Switch OLED",
+        "price": 449.99,
+        "quantity": 1,
+        "sku": "NIN-SWITCH-OLED-WHT"
+      },
+      {
+        "product_id": 44,
+        "name": "Steam Deck",
+        "price": 799.99,
+        "quantity": 1,
+        "sku": "STEAM-DECK-512-BLK"
+      }
+    ],
+    "subtotal": 1249.98,
+    "tax": 162.50,
+    "total": 1412.48,
+    "date": "2026-03-29T16:20:00Z"
+  },
+  {
+    "invoice_id": 1006,
+    "items": [
+      {
+        "product_id": 21,
+        "name": "Apple USB-C Charger",
+        "price": 29.99,
+        "quantity": 3,
+        "sku": "APL-USBC-20W-WHT"
+      }
+    ],
+    "subtotal": 89.97,
+    "tax": 11.70,
+    "total": 101.67,
+    "date": "2026-03-30T09:15:00Z"
+  },
+  {
+    "invoice_id": 1007,
+    "items": [
+      {
+        "product_id": 26,
+        "name": "Samsung Galaxy Tab S9",
+        "price": 1099.99,
+        "quantity": 1,
+        "sku": "SMS-TABS9-256-GRY"
+      },
+      {
+        "product_id": 43,
+        "name": "Logitech C920 HD Webcam",
+        "price": 119.99,
+        "quantity": 1,
+        "sku": "LOG-C920-BLK"
+      }
+    ],
+    "subtotal": 1219.98,
+    "tax": 158.60,
+    "total": 1378.58,
+    "date": "2026-03-31T11:45:00Z"
+  },
+  {
+    "invoice_id": 1008,
+    "items": [
+      {
+        "product_id": 18,
+        "name": "PlayStation 5",
+        "price": 649.99,
+        "quantity": 1,
+        "sku": "SNY-PS5-DISC-WHT"
+      },
+      {
+        "product_id": 29,
+        "name": "LG UltraGear 27\" Monitor",
+        "price": 499.99,
+        "quantity": 1,
+        "sku": "LG-27GP850-BLK"
+      },
+      {
+        "product_id": 50,
+        "name": "Corsair K70 RGB Keyboard",
+        "price": 219.99,
+        "quantity": 1,
+        "sku": "COR-K70-RGB-BLK"
+      }
+    ],
+    "subtotal": 1369.97,
+    "tax": 178.10,
+    "total": 1548.07,
+    "date": "2026-03-31T15:30:00Z"
+  },
+  {
+    "invoice_id": 1009,
+    "items": [
+      {
+        "product_id": 25,
+        "name": "iPad Mini (6th Generation)",
+        "price": 899.99,
+        "quantity": 1,
+        "sku": "APL-IPADMINI6-256-PRP"
+      },
+      {
+        "product_id": 42,
+        "name": "Belkin 3-in-1 MagSafe Charger",
+        "price": 179.99,
+        "quantity": 1,
+        "sku": "BEL-3IN1-MAG-WHT"
+      }
+    ],
+    "subtotal": 1079.98,
+    "tax": 140.40,
+    "total": 1220.38,
+    "date": "2026-04-01T10:10:00Z"
+  },
+  {
+    "invoice_id": 1010,
+    "items": [
+      {
+        "product_id": 4,
+        "name": "Samsung Galaxy S24",
+        "price": 1199.99,
+        "quantity": 2,
+        "sku": "SMS-S24-256-BLK"
+      },
+      {
+        "product_id": 41,
+        "name": "Anker 737 GaN Charger",
+        "price": 139.99,
+        "quantity": 2,
+        "sku": "ANK-737-GAN-BLK"
+      }
+    ],
+    "subtotal": 2679.96,
+    "tax": 348.39,
+    "total": 3028.35,
+    "date": "2026-04-01T13:25:00Z"
+  },
+  {
+    "invoice_id": 1011,
+    "items": [
+      {
+        "product_id": 46,
+        "name": "DJI Mini 4 Pro",
+        "price": 999.99,
+        "quantity": 1,
+        "sku": "DJI-MINI4PRO-GRY"
+      }
+    ],
+    "subtotal": 999.99,
+    "tax": 130.00,
+    "total": 1129.99,
+    "date": "2026-04-01T16:50:00Z"
+  },
+  {
+    "invoice_id": 1012,
+    "items": [
+      {
+        "product_id": 34,
+        "name": "HomePod (2nd Generation)",
+        "price": 399.99,
+        "quantity": 2,
+        "sku": "APL-HOMEPOD2-WHT"
+      },
+      {
+        "product_id": 48,
+        "name": "Sonos Roam",
+        "price": 229.99,
+        "quantity": 1,
+        "sku": "SON-ROAM-WHT"
+      }
+    ],
+    "subtotal": 1029.97,
+    "tax": 133.90,
+    "total": 1163.87,
+    "date": "2026-04-02T09:05:00Z"
+  },
+  {
+    "invoice_id": 1013,
+    "items": [
+      {
+        "product_id": 27,
+        "name": "Lenovo IdeaPad Slim 5",
+        "price": 999.99,
+        "quantity": 1,
+        "sku": "LEN-IPADSLIM5-512-GRY"
+      },
+      {
+        "product_id": 22,
+        "name": "Logitech MX Master 3",
+        "price": 129.99,
+        "quantity": 1,
+        "sku": "LOG-MXMASTER3-BLK"
+      }
+    ],
+    "subtotal": 1129.98,
+    "tax": 146.90,
+    "total": 1276.88,
+    "date": "2026-04-02T10:30:00Z"
+  },
+  {
+    "invoice_id": 1014,
+    "items": [
+      {
+        "product_id": 47,
+        "name": "Ring Video Doorbell 4",
+        "price": 239.99,
+        "quantity": 1,
+        "sku": "RING-DOORBELL4-SLV"
+      },
+      {
+        "product_id": 36,
+        "name": "Echo Dot (5th Gen)",
+        "price": 79.99,
+        "quantity": 2,
+        "sku": "AMZ-ECHODOT5-BLU"
+      }
+    ],
+    "subtotal": 399.97,
+    "tax": 52.00,
+    "total": 451.97,
+    "date": "2026-04-02T11:45:00Z"
+  },
+  {
+    "invoice_id": "8042",
+    "date": "2026-03-01T14:30:00Z",
+    "status": "Paid",
+    "subtotal": 1099.00,
+    "tax": 142.87,
+    "total": 1241.87,
+    "items": [
+      {
+        "product_id": "prod_macbook_air",
+        "name": "MacBook Air (M2)",
+        "price": 1099.00,
+        "quantity": 1,
+        "refunded": false
+      }
+    ]
+  },
+  {
+    "invoice_id": "7911",
+    "date": "2026-02-14T09:15:00Z",
+    "status": "Paid",
+    "subtotal": 149.97,
+    "tax": 19.50,
+    "total": 169.47,
+    "items": [
+      {
+        "product_id": "prod_airtag_4pack",
+        "name": "Apple AirTag 4-Pack",
+        "price": 99.98,
+        "quantity": 1,
+        "refunded": false
+      },
+      {
+        "product_id": "prod_magsafe_case",
+        "name": "iPhone 15 Clear Case with MagSafe",
+        "price": 49.99,
+        "quantity": 1,
+        "refunded": false
+      }
+    ]
+  }
+]

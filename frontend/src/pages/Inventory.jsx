@@ -19,16 +19,18 @@ import {
 } from "lucide-react";
 import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
-import "../css/home.css";
+import "../css/inventory.css";
+import Header from "../components/Header";
 
 function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -58,22 +60,6 @@ function Inventory() {
 
   useEffect(() => {
     fetchItems();
-  }, []);
-
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const fetchItems = () => {
@@ -186,6 +172,23 @@ function Inventory() {
       ...editForm,
       [e.target.name]: e.target.value
     });
+    setHasUnsavedChanges(true);
+  };
+
+
+  const handleClosePanel = () => {
+    if (hasUnsavedChanges) {
+      // Triggers the built-in browser popup
+      const confirmExit = window.confirm("You have unsaved changes. Are you sure you want to exit without saving?");
+
+      if (!confirmExit) {
+        return; // Stops the function if they click "Cancel" on the popup
+      }
+    }
+
+    // If they clicked "OK" (or had no changes), clear the panel
+    setSelectedItem(null);
+    setHasUnsavedChanges(false); // Reset the tracker
   };
 
   const generateSku = (brand, name, storage, color) => {
@@ -357,8 +360,16 @@ function Inventory() {
 
           <div className="header-right">
             {!isReadOnly && (
+        <Header
+          title="Inventory"
+          tagText={`${filteredItems.length} items`}
+          showSearch={true}
+          searchPlaceholder="Search inventory..."
+          searchValue={searchTerm}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          rightAction={
             <button
-              className="checkout-btn inventory-add-btn"
+              className="submit-btn inventory-add-btn"
               onClick={() => setShowModal(true)}
               type="button"
             >
@@ -368,6 +379,8 @@ function Inventory() {
             )}
           </div>
         </header>
+          }
+        />
 
         {loading ? (
           <p>Loading inventory...</p>
@@ -394,9 +407,22 @@ function Inventory() {
           <>
             <div className="order-header">
               <h3>Edit Product</h3>
+
+              <button className="clear-cart-btn" onClick={handleClosePanel}>
+                Close
+              </button>
             </div>
 
+
             <div className="order-list">
+
+              {/* <div className="form-group">
+                <label>SKU</label>
+                <div className="read-only-value">
+                  {selectedItem.sku || ""}
+                </div>
+              </div> */}
+
               <div className="form-group">
                 <label>Product Name</label>
                 <input
@@ -482,11 +508,6 @@ function Inventory() {
               </div>
 
               <div className="form-group">
-                <label>SKU</label>
-                <input type="text" value={selectedItem.sku || ""} disabled />
-              </div>
-
-              <div className="form-group">
                 <label>Description</label>
                 <textarea
                   name="description"
@@ -501,7 +522,7 @@ function Inventory() {
             <div className="order-total-section">
               {!isReadOnly && (
               <button
-                className="checkout-btn"
+                className="submit-btn"
                 type="button"
                 onClick={updateItem}
               >

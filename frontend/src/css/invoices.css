@@ -1,0 +1,120 @@
+/* Table Interactions */
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.clickable-row.selected-row {
+    background-color: var(--light-bg);
+}
+
+/* Status Colors & Badges */
+.status-badge {
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+.status-refunded { color: var(--danger); }
+.status-partial { color: #f59e0b; }
+.status-paid { color: #10b981; }
+
+.badge-refunded {
+    color: var(--danger);
+    font-weight: bold;
+    font-size: 0.75rem; 
+    background: #fee2e2;
+    padding: 2px 8px; 
+    border-radius: 4px;
+}
+
+/* Right Panel Unique Layouts */
+.invoice-summary-box {
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+.invoice-summary-box h4 { margin: 0 0 5px 0; color: var(--text-dark); }
+.invoice-summary-box p { margin: 0; font-size: 0.85rem; color: var(--text-grey); }
+
+.warning-box {
+    padding: 10px;
+    margin-top: 14px;
+    background-color: #fee2e2;
+    color: var(--danger);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #fca5a5;
+}
+
+.invoice-items-wrapper {
+    margin-top: 20px;
+}
+
+.invoice-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed var(--border);
+    gap: 16px;
+}
+
+.invoice-item-info {
+    flex: 1; 
+}
+
+.invoice-item-title {
+    margin: 0 0 4px 0; 
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    white-space: normal;
+    text-overflow: clip; 
+    overflow: visible;
+    line-height: 1.2; 
+}
+
+.item-meta { margin: 0; font-size: 0.8rem; color: var(--text-grey); }
+
+.remaining-qty {
+    color: var(--primary);
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.invoice-item-actions {
+    text-align: right;
+}
+
+.refund-action-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.refund-select {
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    outline: none;
+    background: var(--white);
+    color: var(--text-dark);
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+/* Buttons */
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 4px 12px; /* Merged from inline style */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem; /* Merged from inline style */
+    transition: 0.2s;
+}
+.btn-outline-primary:hover { 
+    background: #eff6ff; 
+}

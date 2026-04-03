@@ -1,0 +1,159 @@
+.login-page {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--light-bg); /* Use your light background variable */
+}
+
+/* Form Column */
+.login-form-column {
+    flex: 1; /* Split screen layout */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+/* Branding Header */
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Resize logo icon for the login page */
+.login-header .logo-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 15px;
+    color: var(--white);
+}
+
+.login-header h1 {
+    color: var(--text-dark); /* Use your dark text variable */
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.login-header p {
+    color: var(--text-grey); /* Use your grey text variable */
+    font-size: 0.9rem;
+}
+
+/* Form Card (matching product/modal cards in style) */
+.login-card {
+    background: var(--white); /* Use your white background variable */
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border); /* Use your border variable */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spacing between form fields */
+}
+
+/* Password Input Group (reusing .form-group structure) */
+.password-group {
+    position: relative;
+    margin-bottom: 5px; /* Less margin before forgot link */
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+/* Reset individual input styling to match existing form inputs */
+/* You might not need to reset these if they are already styled globally for input tags */
+.login-card input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--text-dark);
+    outline: none;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Styling for the password toggle button */
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #cbd5e1; /* Reusing a light color for default state */
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: color 0.2s;
+}
+
+.password-toggle-btn:hover {
+    color: var(--text-grey); /* Highlight on hover */
+}
+
+.password-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Forgot Password link styling */
+.forgot-password {
+    text-align: right;
+    margin-bottom: 10px; /* Spacing before sign-in button */
+}
+
+.forgot-password a {
+    color: var(--primary); /* Reuse primary blue for links */
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* --- Illustration Column --- */
+.login-illustration-column {
+    flex: 1; /* Split screen layout */
+    display: flex;
+    overflow: hidden; /* Prevent scaling issues */
+}
+
+.login-illustration-column img {
+    height: 100vh;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .login-page {
+        flex-direction: column; /* Stack columns on smaller screens */
+    }
+
+    .login-form-column,
+    .login-illustration-column {
+        flex: none; /* Reset flex-grow/shrink */
+        width: 100%;
+        min-height: auto; /* Adjust heights */
+    }
+
+    .login-illustration-column {
+        height: 300px; /* Define height for illustration column when stacked */
+        order: -1; /* Place illustration column on top */
+    }
+}

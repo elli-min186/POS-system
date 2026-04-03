@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import "../css/home.css";
-import "../css/earnings.css";
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 function Earnings() {
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
-  const [time, setTime] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/api/items")
@@ -20,21 +18,6 @@ function Earnings() {
       .catch((err) => console.error("Error fetching sales:", err));
   }, []);
 
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const earningsRows = useMemo(() => {
     return products.map((product) => {
@@ -60,27 +43,20 @@ function Earnings() {
   return (
     <div className="container">
       <Sidebar
-        time={time}
         showCategories={false}
         activePage="earnings"
       />
 
       <main className="main-content">
-        <header className="top-bar">
-          <div className="header-left">
-            <h1 id="page-title">Earnings Report</h1>
-            <span className="tag" id="total-revenue">
-              ${totalRevenue.toFixed(2)} Total Revenue
-            </span>
-          </div>
+        <Header
+          title="Earnings Report"
+          titleId="page-title"
+          tagText={`$${totalRevenue.toFixed(2)} Total Revenue`}
+          tagId="total-revenue"
+        />
 
-          <div className="header-right">
-            <span>{time}</span>
-          </div>
-        </header>
-
-        <div className="earnings-table-wrapper">
-          <table className="earnings-table">
+        <div className="shared-table-wrapper">
+          <table className="shared-table">
             <thead>
               <tr>
                 <th>Product</th>
@@ -104,7 +80,7 @@ function Earnings() {
 
               {earningsRows.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="empty-earnings">
+                  <td colSpan="5" className="empty-shared">
                     No earnings data available.
                   </td>
                 </tr>
