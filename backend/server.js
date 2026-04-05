@@ -5,9 +5,24 @@ const path = require("path");
 const fs = require("fs");
 const Products = require("./models/Products");
 const Invoice = require("./models/Invoice");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const http = require("http");
+const { Server } = require("socket.io");
+const User = require("./models/User");
+
 
 const app = express();
+const server = http.createServer(app);
 const PORT = 8080;
+const JWT_SECRET = "cps630_pos_secret_key";
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
+});
 
 const DATABASE_HOST = "localhost";
 const DATABASE_PORT = 27017;
@@ -16,6 +31,14 @@ const DATABASE_NAME = "pos-system";
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+io.on("connection", (socket) => {
+  console.log("A client connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
 
 // MongoDB connection
 const dbURL = `mongodb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`;
@@ -106,6 +129,145 @@ app.get("/", (req, res) => {
 
 // REST Api
 
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+
+    if (!username || !password || !role) {
+      return res.status(400).json({
+        error: "Username, password, and role are required.",
+      });
+    }
+
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res.status(409).json({
+        error: "Username already exists.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      message: "User registered successfully.",
+      user: {
+        username: newUser.username,
+        role: newUser.role,
+      },
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({
+      error: "Failed to register user.",
+    });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({
+        error: "Username and password are required.",
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({
+        error: "Invalid username or password.",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        error: "Invalid username or password.",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+      },
+      JWT_SECRET,
+      { expiresIn: "8h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful.",
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      error: "Failed to login.",
+    });
+  }
+});
+
+
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({
+      error: "Access denied. No token provided.",
+    });
+  }
+
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : authHeader;
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      error: "Invalid or expired token.",
+    });
+  }
+}
+
+function requireRoles(...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        error: "Forbidden. You do not have access.",
+      });
+    }
+
+    next();
+  };
+}
+
+app.get("/api/me", authMiddleware, async (req, res) => {
+  res.status(200).json({
+    user: req.user,
+  });
+});
+
 // READ ALL ITEMS
 app.get("/api/items", async (req, res) => {
   try {
@@ -142,7 +304,7 @@ app.get("/api/items/:id", async (req, res) => {
 });
 
 // CREATE ITEM
-app.post("/api/items", async (req, res) => {
+app.post("/api/items", authMiddleware, requireRoles("manager", "owner"), async (req, res) => {
   try {
     const userInput = req.body;
 
@@ -162,8 +324,12 @@ app.post("/api/items", async (req, res) => {
 
     await newItem.save();
 
-    console.log(`Added Item: ${newItem.name} (ID: ${newId})`);
+    io.emit("inventoryUpdated", {
+      message: "Inventory has been updated.",
+    });
 
+    console.log(`Added Item: ${newItem.name} (ID: ${newId})`);
+    
     res.status(201).json(newItem);
   } catch (error) {
     console.error("Create error:", error);
@@ -175,8 +341,7 @@ app.post("/api/items", async (req, res) => {
 });
 
 // UPDATE ITEM BY product_id
-app.put("/api/items/:id", async (req, res) => {
-  try {
+app.put("/api/items/:id", authMiddleware, requireRoles("manager", "owner"), async (req, res) => {  try {
     const productId = parseInt(req.params.id);
 
     const updatedItem = await Products.findOneAndUpdate(
@@ -191,6 +356,10 @@ app.put("/api/items/:id", async (req, res) => {
       });
     }
 
+    io.emit("inventoryUpdated", {
+      message: "Inventory has been updated.",
+    });
+
     res.status(200).json(updatedItem);
   } catch (error) {
     console.error("Update error:", error);
@@ -201,8 +370,7 @@ app.put("/api/items/:id", async (req, res) => {
 });
 
 // DELETE ITEM BY product_id
-app.delete("/api/items/:id", async (req, res) => {
-  try {
+app.delete("/api/items/:id", authMiddleware, requireRoles("manager", "owner"), async (req, res) => {  try {
     const productId = parseInt(req.params.id);
 
     const deletedItem = await Products.findOneAndDelete({
@@ -219,6 +387,10 @@ app.delete("/api/items/:id", async (req, res) => {
       `Deleted Item: ${deletedItem.name} (ID: ${deletedItem.product_id})`,
     );
 
+    io.emit("inventoryUpdated", {
+      message: "Inventory has been updated.",
+    });
+
     res.status(200).json({
       message: "Item deleted",
     });
@@ -231,8 +403,7 @@ app.delete("/api/items/:id", async (req, res) => {
 });
 
 // CREATE INVOICE (Checkout)
-app.post("/api/invoices", async (req, res) => {
-  try {
+app.post("/api/invoices", authMiddleware, requireRoles("worker", "manager", "owner"), async (req, res) => {  try {
     const { items, subtotal, tax, total, date } = req.body;
 
     if (!items || items.length === 0) {
@@ -282,6 +453,15 @@ app.post("/api/invoices", async (req, res) => {
 
     // Save to DB
     await newInvoice.save();
+    io.emit("checkoutCompleted", {
+      message: "A new checkout was completed.",
+      invoiceId: newInvoice.invoice_id,
+    });
+
+    io.emit("inventoryUpdated", {
+      message: "Inventory changed after checkout.",
+    });
+
     console.log(`Invoice created successfully! Total: $${total}`);
 
     // 4. Send success response back to frontend
@@ -296,7 +476,7 @@ app.post("/api/invoices", async (req, res) => {
 });
 
 // READ ALL INVOICES
-app.get("/api/invoices", async (req, res) => {
+app.get("/api/invoices", authMiddleware, requireRoles("manager", "owner"), async (req, res) => {
   try {
     // newest invoices show up at the top of the list
     const invoices = await Invoice.find().sort({ date: -1 });
@@ -310,8 +490,7 @@ app.get("/api/invoices", async (req, res) => {
 });
 
 // Process a refund for an invoice
-app.post("/api/invoices/:id/refund", async (req, res) => {
-  // Convert URL param to a Number to match your invoice_id schema
+app.post("/api/invoices/:id/refund", authMiddleware, requireRoles("manager", "owner"), async (req, res) => {  // Convert URL param to a Number to match your invoice_id schema
   const invoiceId = Number(req.params.id);
   const { itemsToRefund } = req.body;
 
@@ -376,6 +555,14 @@ app.post("/api/invoices/:id/refund", async (req, res) => {
 
     // 5. Save everything to the database
     await invoice.save();
+    io.emit("refundProcessed", {
+      message: "A refund was processed.",
+      invoiceId: invoice.invoice_id,
+    });
+
+    io.emit("inventoryUpdated", {
+      message: "Inventory changed after refund.",
+    });
 
     // 6. Send the updated invoice back to the frontend
     res.status(200).json({
@@ -390,7 +577,7 @@ app.post("/api/invoices/:id/refund", async (req, res) => {
 
 // Server Start
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on port: ${PORT}`);
   console.log(`MongoDB URL: ${dbURL}`);
 });
