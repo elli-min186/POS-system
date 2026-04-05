@@ -41,11 +41,6 @@ function Sidebar({
       <div>
         <div className="logo-area">
           <div className="logo-icon">
-            {activePage === "home" ? (
-              <ShoppingCart size={20} />
-            ) : (
-              <Store size={20} />
-            )}
             <Store size={20} />
           </div>
 

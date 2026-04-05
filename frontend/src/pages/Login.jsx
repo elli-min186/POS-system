@@ -24,13 +24,13 @@ function Login() {
                 <div className="login-card">
                     <form className="login-form" onSubmit={(e) => e.preventDefault()}>
                         <div className="form-group">
-                            <label htmlFor="email">Email Address</label>
+                            <label htmlFor="username">Username</label>
                             <input
-                                type="email"
-                                id="email"
-                                name="email"
+                                type="text"
+                                id="username"
+                                name="username"
                                 autoComplete="username"
-                                placeholder="name@example.com"
+                                placeholder="Username"
                                 required
                             />
                         </div>
