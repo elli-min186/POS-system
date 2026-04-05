@@ -2,40 +2,77 @@ import { useState } from "react";
 import { Store, EyeOff, Eye } from "lucide-react";
 import "../css/login.css"
 import loginImage from "../assets/login.jpg"
+import { useNavigate } from "react-router-dom";
 
 function Login() {
 
+    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [error, setError] = useState("");
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const navigate = useNavigate();
+
+    // 2. Handle input changes
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // 3. The Submit Function
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(""); // Reset error
+
+        try {
+            const response = await fetch("http://localhost:8080/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // SUCCESS: Save the token and user info
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                
+                // Redirect to home
+                navigate("/"); 
+            } else {
+                // FAIL: Show the error from your backend
+                setError(data.error || "Login failed");
+            }
+        } catch (err) {
+            setError("Server is not responding. Is it running?");
+        }
+    };
 
     return (
         <div className="login-page">
-            {/* Form Column */}
             <div className="login-form-column">
-
                 <div className="login-header">
-                    <div className="logo-icon">
-                        <Store />
-                    </div>
+                    <div className="logo-icon"><Store /></div>
                     <h1>TechPOS</h1>
                     <p>Sign in to your account</p>
                 </div>
 
-                {/* Central Form Card */}
                 <div className="login-card">
-                    <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+                    {/* Display Error Message if it exists */}
+                    {error && <div className="error-message" style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
+
+                    <form className="login-form" onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
-                                autoComplete="username"
                                 placeholder="Username"
+                                value={formData.username}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
 
-                        {/* Password Field with Toggle */}
                         <div className="form-group password-group">
                             <label htmlFor="password">Password</label>
                             <div className="password-input-wrapper">
@@ -43,25 +80,17 @@ function Login() {
                                     type={passwordVisible ? "text" : "password"}
                                     id="password"
                                     name="password"
-                                    autoComplete="current-password"
                                     placeholder="Enter your password"
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     required
                                 />
-                                {/* Password Toggle Button/Icon */}
                                 <button
                                     type="button"
                                     className="password-toggle-btn"
                                     onClick={() => setPasswordVisible(!passwordVisible)}
-                                    aria-label={passwordVisible ? "Hide password" : "Show password"}
                                 >
-                                    {/* Eye Icon (Hide) */}
-                                    {passwordVisible &&
-                                        <Eye />
-                                    }
-                                    {/* Eye-Slash Icon (Show) */}
-                                    {!passwordVisible &&
-                                        <EyeOff />
-                                    }
+                                    {passwordVisible ? <Eye /> : <EyeOff />}
                                 </button>
                             </div>
                         </div>
@@ -73,7 +102,6 @@ function Login() {
                 </div>
             </div>
 
-            {/* Illustration Column */}
             <div className="login-illustration-column">
                 <img src={loginImage} alt="TechPOS Login Illustration" />
             </div>
