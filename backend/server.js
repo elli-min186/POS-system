@@ -54,6 +54,7 @@ db.on("open", async function () {
   console.log("Database connected!");
   await seedProducts();
   await seedInvoices();
+  await seedUsers();
 });
 
 // File used for initial seed
@@ -120,6 +121,39 @@ async function seedInvoices() {
     }
   } catch (error) {
     console.error("Error seeding invoices:", error);
+  }
+}
+
+async function seedUsers() {
+  try {
+    const existingUsers = await User.countDocuments();
+
+    if (existingUsers === 0) {
+      const users = [
+        {
+          username: "worker1",
+          password: await bcrypt.hash("123456", 10),
+          role: "worker",
+        },
+        {
+          username: "manager1",
+          password: await bcrypt.hash("123456", 10),
+          role: "manager",
+        },
+        {
+          username: "owner1",
+          password: await bcrypt.hash("123456", 10),
+          role: "owner",
+        },
+      ];
+
+      await User.insertMany(users);
+      console.log("Default users created");
+    } else {
+      console.log("Users already exist");
+    }
+  } catch (error) {
+    console.error("Error seeding users:", error);
   }
 }
 
