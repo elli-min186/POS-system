@@ -19,6 +19,14 @@ function Sidebar({
 
   const role = localStorage.getItem("role") || "worker";
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const username = user?.username || "User";
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
+
   const [time, setTime] = useState("");
   useEffect(() => {
     const updateClock = () => {
@@ -38,6 +46,8 @@ function Sidebar({
 
   return (
     <aside className="sidebar">
+
+      {/* TOP SECTION */}
       <div>
         <div className="logo-area">
           <div className="logo-icon">
@@ -47,6 +57,10 @@ function Sidebar({
           <div>
             <h2>TechPOS</h2>
             <span className="subtitle">{time}</span>
+
+            <p className="sidebar-welcome">
+              Welcome, <strong>{username}</strong>
+            </p>
           </div>
         </div>
 
@@ -70,6 +84,7 @@ function Sidebar({
         )}
       </div>
 
+      {/* NAV + LOGOUT */}
       <div className="sidebar-bottom">
         <h3>NAVIGATION</h3>
 
@@ -112,6 +127,10 @@ function Sidebar({
             </li>
           )}
         </ul>
+        {/* LOGOUT */}
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </aside>
   );
