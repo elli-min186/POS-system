@@ -21,7 +21,7 @@ import InventoryCard from "../components/InventoryCard";
 import Sidebar from "../components/Sidebar";
 import "../css/inventory.css";
 import Header from "../components/Header";
-import { Navigate } from "react-router-dom";
+import { socket } from '../socket'
 
 
 function Inventory() {
@@ -66,6 +66,31 @@ function Inventory() {
 // Fetch inventory items from backend once on mount
   useEffect(() => {
     fetchItems();
+    socket.connect();
+
+    function onConnect() {
+      console.log('Connected to socket!');
+    }
+
+    function onDisconnect() {
+      console.log('Disconnected from socket!');
+    }
+
+    function onInventoryUpdated(message) {
+      console.log(message);
+      fetchItems();
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('inventoryUpdated', onInventoryUpdated);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('inventoryUpdated', onInventoryUpdated);
+      socket.disconnect();
+    };
   }, []);
 
   const fetchItems = () => {
@@ -83,7 +108,6 @@ function Inventory() {
         setLoading(false);
       });
   };
-  
 
   const categories = [
     { name: "all", label: "All Items", icon: <LayoutGrid size={18} /> },

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import "../css/invoices.css" 
 import { Navigate } from "react-router-dom";
+import { socket } from "../socket";
 
 function Invoices() {
   const [invoices, setInvoices] = useState([]);
@@ -23,25 +24,54 @@ function Invoices() {
   // Fetch all invoices from the backend on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
+    fetchInvoices(token, setInvoices, setLoading);
+    socket.connect();
 
-  fetch("http://localhost:8080/api/invoices", {
-    headers: {
-      Authorization: `Bearer ${token}` // ⭐ REQUIRED
+    function onConnect() {
+      console.log('Connected to socket!');
     }
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error("Unauthorized");
-      return res.json();
+
+    function onDisconnect() {
+      console.log('Disconnected from socket!');
+    }
+
+    function onInvoicesChanged(message) {
+      console.log(message);
+      setLoading(true);
+      fetchInvoices(token, setInvoices, setLoading);
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('checkoutCompleted', onInvoicesChanged);
+    socket.on('refundProcessed', onInvoicesChanged);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('checkoutCompleted', onInvoicesChanged);
+    }
+  }, []);
+
+  function fetchInvoices(token, setInvoices, setLoading) {
+    fetch("http://localhost:8080/api/invoices", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
-    .then((data) => {
-      setInvoices(Array.isArray(data) ? data : []);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Failed to fetch invoices:", err);
-      setLoading(false);
-    });
-}, []);
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        setInvoices(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch invoices:", err);
+        setLoading(false);
+      });
+  }
 
   // Logic to check if an invoice was created within the last 14 days
   const isRefundable = (dateString) => {

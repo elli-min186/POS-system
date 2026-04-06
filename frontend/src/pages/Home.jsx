@@ -21,6 +21,7 @@ import ProductCard from "../components/ProductCard";
 import Sidebar from "../components/Sidebar";
 import "../css/home.css";
 import Header from "../components/Header";
+import { socket } from '../socket';
 
 // Retrieve user role (may be used for conditional permissions)
 const role = localStorage.getItem("role") || "worker";
@@ -32,12 +33,10 @@ function Home() {
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cart, setCart] = useState([]);
-
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
   // ---------------- FETCH PRODUCTS ----------------
-  // Fetch all items from backend on component mount
   const fetchItems = async () => {
     try {
       const res = await fetch("http://localhost:8080/api/items");
@@ -48,8 +47,27 @@ function Home() {
     }
   };
 
+  // ---------------- SOCKET & INITIAL FETCH ----------------
   useEffect(() => {
     fetchItems();
+
+    // Connect to the socket server
+    socket.connect();
+
+    // Listener function
+    function onInventoryUpdated() {
+      console.log("External inventory change detected. Refreshing...");
+      fetchItems();
+    }
+
+    // Subscribe to the event
+    socket.on('inventoryUpdated', onInventoryUpdated);
+
+    // CLEANUP: Unsubscribe and disconnect when user leaves the page
+    return () => {
+      socket.off('inventoryUpdated', onInventoryUpdated);
+      socket.disconnect();
+    };
   }, []);
 
   // ---------------- FILTER LOGIC ----------------
@@ -171,7 +189,7 @@ function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` 
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(invoiceData),
       });
@@ -335,31 +353,6 @@ function Home() {
           </button>
         </div>
       </aside>
-
-      {}
-      <style>{`
-        @media screen and (max-width: 768px) {
-          .container {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          
-          .sidebar {
-            width: 100%;
-            order: 2;
-          }
-
-          .main-content {
-            width: 100%;
-            order: 1;
-          }
-
-          .order-panel {
-            width: 100%;
-            order: 3;
-          }
-        }
-      `}</style>
     </div>
   );
 }
