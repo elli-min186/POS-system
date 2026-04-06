@@ -37,7 +37,7 @@ function Login() {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 
                 // Redirect to home
-                navigate("/"); 
+                window.location.href = "/"; 
             } else {
                 // FAIL: Show the error from your backend
                 setError(data.error || "Login failed");
