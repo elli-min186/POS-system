@@ -33,6 +33,7 @@ function Login() {
             if (response.ok) {
                 // SUCCESS: Save the token and user info
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("role", data.user.role);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 
                 // Redirect to home

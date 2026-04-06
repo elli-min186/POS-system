@@ -16,11 +16,20 @@ function Earnings() {
 
   // fetch invoices once
   useEffect(() => {
-  fetch("http://localhost:8080/api/invoices")
-    .then((res) => res.json())
+  const token = localStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/invoices", {
+    headers: {
+      Authorization: `Bearer ${token}` // ⭐ REQUIRED
+    }
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
+    })
     .then((data) => setInvoices(Array.isArray(data) ? data : []))
     .catch((err) => console.error("Error fetching invoices:", err));
-  }, []);
+}, []);
 
 
   // aggregate items by product

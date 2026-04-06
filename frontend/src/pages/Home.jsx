@@ -148,6 +148,7 @@ function Home() {
   // Creates an invoice and completes the transaction
   const handleCheckout = async () => {
     if (cart.length === 0) return alert("Cart is empty!");
+    const token = localStorage.getItem("token");
 
     // Re-verify stock levels before processing
     for (let item of cart) {
@@ -168,7 +169,10 @@ function Home() {
     try {
       const response = await fetch("http://localhost:8080/api/invoices", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` 
+        },
         body: JSON.stringify(invoiceData),
       });
 

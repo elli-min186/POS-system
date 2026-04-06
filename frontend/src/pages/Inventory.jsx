@@ -23,6 +23,7 @@ import "../css/inventory.css";
 import Header from "../components/Header";
 import { Navigate } from "react-router-dom";
 
+
 function Inventory() {
   // inventory list + UI state
   const [items, setItems] = useState([]);
@@ -49,9 +50,6 @@ function Inventory() {
   // Role-based access (workers cannot access inventory page)
   const role = localStorage.getItem("role") || "worker"; // fallback for testing
   const isReadOnly = role === "worker";
-    if (role === "worker") {
-    return <Navigate to="/" replace />;
-  }
 
   
   const [newProduct, setNewProduct] = useState({
@@ -85,6 +83,7 @@ function Inventory() {
         setLoading(false);
       });
   };
+  
 
   const categories = [
     { name: "all", label: "All Items", icon: <LayoutGrid size={18} /> },
@@ -133,10 +132,13 @@ function Inventory() {
   };
 
   const confirmDeleteItem = async (id) => {
-    if (isReadOnly) return;
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:8080/api/items/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
 
       const data = await response.json();
@@ -230,6 +232,7 @@ function Inventory() {
 
   // Add new inventory item to backend and refresh local list state
   const addProduct = async (e) => {
+    const token = localStorage.getItem("token");
     e.preventDefault();
     if (isReadOnly) return;
 
@@ -268,6 +271,7 @@ function Inventory() {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
+          ,Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(productToSend)
       });
@@ -299,6 +303,7 @@ function Inventory() {
   };
 
   const updateItem = async () => {
+    const token = localStorage.getItem("token");
     if (Number(editForm.price) < 0) {
       alert("Price cannot be negative");
       return;
@@ -318,7 +323,8 @@ function Inventory() {
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
             ...editForm,

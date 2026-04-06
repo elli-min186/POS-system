@@ -22,17 +22,26 @@ function Invoices() {
 
   // Fetch all invoices from the backend on component mount
   useEffect(() => {
-    fetch("http://localhost:8080/api/invoices")
-      .then((res) => res.json())
-      .then((data) => {
-        setInvoices(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch invoices:", err);
-        setLoading(false);
-      });
-  }, []);
+    const token = localStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/invoices", {
+    headers: {
+      Authorization: `Bearer ${token}` // ⭐ REQUIRED
+    }
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
+    })
+    .then((data) => {
+      setInvoices(Array.isArray(data) ? data : []);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Failed to fetch invoices:", err);
+      setLoading(false);
+    });
+}, []);
 
   // Logic to check if an invoice was created within the last 14 days
   const isRefundable = (dateString) => {
@@ -44,28 +53,40 @@ function Invoices() {
 
   // Sends the refund request to the backend and updates the local state with the returned data
   const processRefund = async (invoiceId, itemsToRefund) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/invoices/${invoiceId}/refund`, {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `http://localhost:8080/api/invoices/${invoiceId}/refund`,
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemsToRefund })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSelectedInvoice(data.invoice);
-        setInvoices((prev) =>
-          prev.map((inv) => inv.invoice_id === invoiceId ? data.invoice : inv)
-        );
-        setRefundQuantities({});
-      } else {
-        alert(data.error || "Failed to process refund");
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          itemsToRefund: itemsToRefund
+        })
       }
-    } catch (error) {
-      console.error("Failed to process refund", error);
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setSelectedInvoice(data.invoice);
+      setInvoices(prev =>
+        prev.map(inv =>
+          inv.invoice_id === invoiceId ? data.invoice : inv
+        )
+      );
+      setRefundQuantities({});
+    } else {
+      alert(data.error || "Failed to process refund");
     }
-  };
+  } catch (error) {
+    console.error("Failed to process refund", error);
+  }
+};
 
   const getStatusClass = (status) => {
     if (status === "Fully Refunded") return "status-refunded";
