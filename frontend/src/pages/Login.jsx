@@ -3,6 +3,7 @@ import { Store, EyeOff, Eye } from "lucide-react";
 import "../css/login.css"
 import loginImage from "../assets/login.jpg"
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function Login() {
 
@@ -10,6 +11,15 @@ function Login() {
     const [error, setError] = useState("");
     const [passwordVisible, setPasswordVisible] = useState(false);
     const navigate = useNavigate();
+
+     // 1. Check for session expiration
+    useEffect(() => {
+        if (localStorage.getItem("sessionExpired") === "true") {
+            setError("Your session has expired. Please log in again.");
+            localStorage.removeItem("sessionExpired");
+        }
+    }, []);
+
 
     // 2. Handle input changes
     const handleChange = (e) => {

@@ -23,7 +23,18 @@ function Earnings() {
       },
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Unauthorized");
+        if (res.status === 401) {
+          console.log("Token expired / invalid → clearing storage");
+
+          localStorage.clear();
+          localStorage.setItem("sessionExpired", "true");
+          window.location.href = "/login";
+
+          throw new Error("Unauthorized");
+        }
+
+        if (!res.ok) throw new Error("Request failed");
+
         return res.json();
       })
       .then((data) => {
