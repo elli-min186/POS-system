@@ -163,7 +163,7 @@ app.get("/", (req, res) => {
 
 // REST Api
 
-app.post("/api/register", async (req, res) => {
+app.post("/api/register", authMiddleware, requireRoles("owner"), async (req, res) => {
   try {
     const { username, password, role } = req.body;
 

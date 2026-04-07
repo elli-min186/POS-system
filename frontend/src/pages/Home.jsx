@@ -35,6 +35,7 @@ function Home() {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showUserModal, setShowUserModal] = useState(false);
 
   // ---------------- FETCH PRODUCTS ----------------
   const fetchItems = async () => {
@@ -149,6 +150,53 @@ function Home() {
         .filter(Boolean)
     );
   };
+
+  // ------------- USER MANAGEMENT ---------------
+  useEffect(() => {
+  const openModal = () => setShowUserModal(true);
+
+  window.addEventListener("openUserModal", openModal);
+
+  return () => window.removeEventListener("openUserModal", openModal);
+}, []);
+
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newRole, setNewRole] = useState("worker");
+
+  const handleCreateUser = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch("http://localhost:8080/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        username: newUsername,
+        password: newPassword,
+        role: newRole
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("User created successfully!");
+      setShowUserModal(false);
+      setNewUsername("");
+      setNewPassword("");
+    } else {
+      alert(data.error);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  };
+
+
 
   // ---------------- CLEAR CART ----------------
   const clearCart = () => setCart([]);
@@ -353,6 +401,49 @@ function Home() {
           </button>
         </div>
       </aside>
+
+      {/* ---------------- USER MODAL ---------------- */}
+      {showUserModal && (
+        <div className="user-modal-overlay">
+          <div className="user-modal-card">
+            <h2>Create User</h2>
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+
+            <select
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+            >
+              <option value="worker">Worker</option>
+              <option value="manager">Manager</option>
+            </select>
+
+            <div className="user-modal-actions">
+              <button className="submit-btn" onClick={handleCreateUser}>
+                Create
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowUserModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

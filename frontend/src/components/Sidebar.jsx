@@ -64,6 +64,16 @@ function Sidebar({
           </div>
         </div>
 
+        {/* Users Management (OWNER ONLY) */}
+        {role === "owner" && (
+          <button
+            className="manage-users-btn"
+            onClick={() => window.dispatchEvent(new Event("openUserModal"))}
+          >
+            Manage Users
+          </button>
+        )}
+
         {showCategories && (
           <nav className="categories">
             <h3>CATEGORIES</h3>
@@ -126,6 +136,7 @@ function Sidebar({
               </Link>
             </li>
           )}
+
         </ul>
         {/* LOGOUT */}
         <button className="logout-btn" onClick={handleLogout}>
