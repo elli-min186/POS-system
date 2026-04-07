@@ -4,95 +4,113 @@ import Header from "../components/Header";
 import { Navigate } from "react-router-dom";
 
 function Earnings() {
-  // invoices state
   const [invoices, setInvoices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // owner-only page
   const role = localStorage.getItem("role") || "worker";
 
   if (role !== "owner") {
-  return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />;
   }
 
-  // fetch invoices once
+  // Fetch invoices
   useEffect(() => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  fetch("http://localhost:8080/api/invoices", {
-    headers: {
-      Authorization: `Bearer ${token}` // ⭐ REQUIRED
-    }
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error("Unauthorized");
-      return res.json();
+    fetch("http://localhost:8080/api/invoices", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then((data) => setInvoices(Array.isArray(data) ? data : []))
-    .catch((err) => console.error("Error fetching invoices:", err));
-}, []);
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json();
+      })
+      .then((data) => {
+        setInvoices(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching invoices:", err);
+        setLoading(false);
+      });
+  }, []);
 
-
-  // aggregate items by product
+  // Aggregate earnings by product
   const earningsRows = useMemo(() => {
-  const map = {};
+    const map = {};
 
-  invoices.forEach((inv) => {
-    inv.items?.forEach((item) => {
-      const key = item.product_id;
+    invoices.forEach((inv) => {
+      inv.items?.forEach((item) => {
+        const key = item.product_id;
 
-      if (!map[key]) {
-        map[key] = {
-          id: key,
-          name: item.name,
-          sku: item.sku || "N/A",
-          unitsSold: 0,
-          price: Number(item.price),
-          total: 0,
-        };
-      }
+        if (!map[key]) {
+          map[key] = {
+            id: key,
+            name: item.name,
+            sku: item.sku || "N/A",
+            unitsSold: 0,
+            refundedUnits: 0,
+            price: Number(item.price),
+            total: 0,
+          };
+        }
 
-      const refunded = item.refunded_quantity || 0;
-      const actualSold = item.quantity - refunded;
+        const refunded = item.refunded_quantity || 0;
+        const actualSold = item.quantity - refunded;
 
-      map[key].unitsSold += actualSold;
-      map[key].total += actualSold * item.price;
+        map[key].unitsSold += actualSold;
+        map[key].refundedUnits += refunded;
+        map[key].total += actualSold * item.price;
+      });
     });
-  });
 
-  return Object.values(map);
+    return Object.values(map).sort((a, b) => b.total - a.total);
   }, [invoices]);
 
-  const totalRevenue = useMemo(() => {
-    return earningsRows.reduce((sum, row) => sum + row.total, 0);
-  }, [earningsRows]);
+  // Stats
+  const totalRevenue = useMemo(
+    () => earningsRows.reduce((sum, row) => sum + row.total, 0),
+    [earningsRows]
+  );
 
-  const totalUnitsSold = useMemo(() => {
-  return earningsRows.reduce((sum, row) => sum + row.unitsSold, 0);
-  }, [earningsRows]);
+  const totalUnitsSold = useMemo(
+    () => earningsRows.reduce((sum, row) => sum + row.unitsSold, 0),
+    [earningsRows]
+  );
 
-  const bestSeller = useMemo(() => {
-    return [...earningsRows].sort((a, b) => b.unitsSold - a.unitsSold)[0];
-  }, [earningsRows]);
+  const totalInvoices = invoices.length;
 
-  const topRevenueItem = useMemo(() => {
-    return [...earningsRows].sort((a, b) => b.total - a.total)[0];
-  }, [earningsRows]);
+  const totalRefundedValue = useMemo(() => {
+    return invoices.reduce((sum, inv) => {
+      return (
+        sum +
+        (inv.items?.reduce((itemSum, item) => {
+          return (
+            itemSum +
+            ((item.refunded_quantity || 0) * Number(item.price))
+          );
+        }, 0) || 0)
+      );
+    }, 0);
+  }, [invoices]);
+
+  const bestSeller = earningsRows[0];
+
+  const topRevenueItem = earningsRows[0];
 
   return (
     <div className="container">
-      <Sidebar
-        showCategories={false}
-        activePage="earnings"
-      />
+      <Sidebar showCategories={false} activePage="earnings" />
 
       <main className="main-content">
         <Header
           title="Earnings Report"
-          titleId="page-title"
           tagText={`$${totalRevenue.toFixed(2)} Total Revenue`}
-          tagId="total-revenue"
           extraTags={[
             `${totalUnitsSold} Units`,
+            `${totalInvoices} Orders`,
+            `Refunded: $${totalRefundedValue.toFixed(2)}`,
             bestSeller ? `Best: ${bestSeller.name}` : "Best: N/A",
             topRevenueItem
               ? `Top: $${topRevenueItem.total.toFixed(2)}`
@@ -100,39 +118,47 @@ function Earnings() {
           ]}
         />
 
-        <div className="shared-table-wrapper">
-          <table className="shared-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Units Sold</th>
-                <th>Price ($)</th>
-                <th>Total ($)</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {earningsRows.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.name}</td>
-                  <td>{row.sku}</td>
-                  <td>{row.unitsSold}</td>
-                  <td>${row.price.toFixed(2)}</td>
-                  <td>${row.total.toFixed(2)}</td>
-                </tr>
-              ))}
-
-              {earningsRows.length === 0 && (
+        {loading ? (
+          <p style={{ padding: "20px" }}>Loading earnings...</p>
+        ) : (
+          <div className="shared-table-wrapper">
+            <table className="shared-table">
+              <thead>
                 <tr>
-                  <td colSpan="5" className="empty-shared">
-                    No earnings data available.
-                  </td>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Units Sold</th>
+                  <th>Refunded</th>
+                  <th>Price ($)</th>
+                  <th>Total ($)</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+
+              <tbody>
+                {earningsRows.map((row, index) => (
+                  <tr key={row.id}>
+                    <td>{index + 1}</td>
+                    <td>{row.name}</td>
+                    <td>{row.sku}</td>
+                    <td>{row.unitsSold}</td>
+                    <td>{row.refundedUnits}</td>
+                    <td>${row.price.toFixed(2)}</td>
+                    <td>${row.total.toFixed(2)}</td>
+                  </tr>
+                ))}
+
+                {earningsRows.length === 0 && (
+                  <tr>
+                    <td colSpan="7" className="empty-shared">
+                      No earnings data available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </main>
     </div>
   );
