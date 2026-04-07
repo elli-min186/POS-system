@@ -337,20 +337,18 @@ function Home() {
                   <strong>{item.name}</strong>
 
                   {/* Quantity Controls (Increment + Decrement) */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
+                  <div className="quantity-controls">
                     <button
+                      className="qty-btn"
                       onClick={() => updateQuantity(item.product_id, -1)}
                     >
-                      -
+                      −
                     </button>
-                    <span>{item.quantity}</span>
+
+                    <span className="qty-value">{item.quantity}</span>
+
                     <button
+                      className="qty-btn"
                       onClick={() => updateQuantity(item.product_id, 1)}
                     >
                       +

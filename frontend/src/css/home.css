@@ -91,6 +91,40 @@
     width: 70%;
 }
 
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: var(--text-dark);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.qty-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.qty-value {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
 .hidden {
     display: none !important;
 }
