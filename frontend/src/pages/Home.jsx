@@ -23,9 +23,6 @@ import "../css/home.css";
 import Header from "../components/Header";
 import { socket } from '../socket';
 
-// Retrieve user role (may be used for conditional permissions)
-const role = localStorage.getItem("role") || "worker";
-
 function Home() {
   const TAX_RATE = 0.13;
 
