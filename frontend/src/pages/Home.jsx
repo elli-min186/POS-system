@@ -36,6 +36,21 @@ function Home() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserModal, setShowUserModal] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [users, setUsers] = useState([]);
+  const groupedUsers = {
+    owner: [],
+    manager: [],
+    worker: []
+  };
+
+  users.forEach((u) => {
+    if (groupedUsers[u.role]) {
+      groupedUsers[u.role].push(u);
+    }
+  });
 
   // ---------------- FETCH PRODUCTS ----------------
   const fetchItems = async () => {
@@ -153,12 +168,25 @@ function Home() {
 
   // ------------- USER MANAGEMENT ---------------
   useEffect(() => {
-  const openModal = () => setShowUserModal(true);
+    const openModal = async () => {
+      setShowUserModal(true);
 
-  window.addEventListener("openUserModal", openModal);
+      const token = localStorage.getItem("token");
 
-  return () => window.removeEventListener("openUserModal", openModal);
-}, []);
+      const res = await fetch("http://localhost:8080/api/users", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      setUsers(data);
+    };
+
+    window.addEventListener("openUserModal", openModal);
+
+    return () => window.removeEventListener("openUserModal", openModal);
+  }, []);
 
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -196,6 +224,49 @@ function Home() {
   }
   };
 
+  const handleDeleteUser = async (id, username) => {
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+    if (username === currentUser.username) {
+      alert("You cannot delete yourself");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    await fetch(`http://localhost:8080/api/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    setUsers(users.filter(u => u._id !== id));
+    setConfirmDeleteId(null); // reset after delete
+  };
+
+  const handleUpdatePassword = async (id) => {
+    if (!newUserPassword) {
+      alert("Enter a password first");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    await fetch(`http://localhost:8080/api/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ password: newUserPassword })
+    });
+
+    alert("Password updated");
+
+    setEditingUserId(null);
+    setNewUserPassword("");
+  };
 
 
   // ---------------- CLEAR CART ----------------
@@ -402,46 +473,218 @@ function Home() {
 
       {/* ---------------- USER MODAL ---------------- */}
       {showUserModal && (
-        <div className="user-modal-overlay">
-          <div className="user-modal-card">
-            <h2>Create User</h2>
+      <div className="user-modal-overlay">
+        <div className="user-modal-card">
+          <h2>Create User</h2>
 
-            <input
-              type="text"
-              placeholder="Username"
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-            />
+          <input
+            type="text"
+            placeholder="Username"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+          />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+          <input
+            type="password"
+            placeholder="Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
 
-            <select
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value)}
+          <select
+            value={newRole}
+            onChange={(e) => setNewRole(e.target.value)}
+          >
+            <option value="worker">Worker</option>
+            <option value="manager">Manager</option>
+          </select>
+
+          {/* ACTION BUTTONS */}
+          <div className="user-modal-actions">
+            <button className="submit-btn" onClick={handleCreateUser}>
+              Create
+            </button>
+
+            <button
+              className="cancel-btn"
+              onClick={() => setShowUserModal(false)}
             >
-              <option value="worker">Worker</option>
-              <option value="manager">Manager</option>
-            </select>
-
-            <div className="user-modal-actions">
-              <button className="submit-btn" onClick={handleCreateUser}>
-                Create
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowUserModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
+              Cancel
+            </button>
           </div>
+
+          <hr style={{ margin: "20px 0" }} />
+
+          <h3>Users</h3>
+
+          {/* OWNER */}
+          {groupedUsers.owner.length > 0 && (
+            <>
+              <p style={{ fontWeight: "bold", marginTop: "10px" }}>Owner</p>
+              {groupedUsers.owner.map((u) => (
+                <div className="user-row" key={u._id}>
+                  <span>{u.username}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* MANAGERS */}
+          {groupedUsers.manager.length > 0 && (
+            <>
+              <p style={{ fontWeight: "bold", marginTop: "10px" }}>Managers</p>
+              {groupedUsers.manager.map((u) => (
+                <div className="user-row" key={u._id}>
+                  <span>{u.username}</span>
+
+                  <div className="user-actions">
+                    {editingUserId === u._id ? (
+                      <>
+                        <input
+                          type="password"
+                          placeholder="New password"
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          className="password-inline-input"
+                        />
+
+                        <button
+                          className="save-btn"
+                          onClick={() => handleUpdatePassword(u._id)}
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          className="cancel-btn-small"
+                          onClick={() => {
+                            setEditingUserId(null);
+                            setNewUserPassword("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="secondary-btn"
+                          onClick={() => setEditingUserId(u._id)}
+                        >
+                          Reset
+                        </button>
+
+                        {confirmDeleteId === u._id ? (
+                          <>
+                            <button
+                              className="danger-btn"
+                              onClick={() => handleDeleteUser(u._id, u.username)}
+                            >
+                              Confirm
+                            </button>
+
+                            <button
+                              className="cancel-btn-small"
+                              onClick={() => setConfirmDeleteId(null)}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            className="danger-btn"
+                            onClick={() => setConfirmDeleteId(u._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* WORKERS */}
+          {groupedUsers.worker.length > 0 && (
+            <>
+              <p style={{ fontWeight: "bold", marginTop: "10px" }}>Workers</p>
+              {groupedUsers.worker.map((u) => (
+                <div className="user-row" key={u._id}>
+                  <span>{u.username}</span>
+
+                  <div className="user-actions">
+                    {editingUserId === u._id ? (
+                      <>
+                        <input
+                          type="password"
+                          placeholder="New password"
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          className="password-inline-input"
+                        />
+
+                        <button
+                          className="save-btn"
+                          onClick={() => handleUpdatePassword(u._id)}
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          className="cancel-btn-small"
+                          onClick={() => {
+                            setEditingUserId(null);
+                            setNewUserPassword("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="secondary-btn"
+                          onClick={() => setEditingUserId(u._id)}
+                        >
+                          Reset
+                        </button>
+                        
+                        {confirmDeleteId === u._id ? (
+                          <>
+                            <button
+                              className="danger-btn"
+                              onClick={() => handleDeleteUser(u._id, u.username)}
+                            >
+                              Confirm
+                            </button>
+
+                            <button
+                              className="cancel-btn-small"
+                              onClick={() => setConfirmDeleteId(null)}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            className="danger-btn"
+                            onClick={() => setConfirmDeleteId(u._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 }

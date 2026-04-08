@@ -206,6 +206,58 @@ app.post("/api/register", authMiddleware, requireRoles("owner"), async (req, res
   }
 });
 
+// GET ALL USERS
+app.get("/api/users", authMiddleware, requireRoles("owner"), async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0 });
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+// UPDATE USER PASSWORD
+app.put("/api/users/:id", authMiddleware, requireRoles("owner"), async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.findByIdAndUpdate(req.params.id, {
+      password: hashedPassword
+    });
+
+    res.status(200).json({ message: "Password updated" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// DELETE USER
+app.delete("/api/users/:id", authMiddleware, requireRoles("owner"), async (req, res) => {
+  try {
+    const userToDelete = await User.findById(req.params.id);
+
+    if (!userToDelete) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (userToDelete.role === "owner") {
+      return res.status(403).json({ error: "Cannot delete owner account" });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
