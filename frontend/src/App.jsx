@@ -41,6 +41,8 @@ function App() {
             path="/earnings"
             element={isLoggedIn ? <Earnings /> : <Navigate to="/login" />}
           />
+
+          <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} />} />
         </Routes>
 
         {/* 🔥 GLOBAL MODAL */}
