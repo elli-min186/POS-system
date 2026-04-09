@@ -242,3 +242,21 @@ body {
         width: 100%;
     }
 }
+
+
+/* 📱 MOBILE FIX FOR HOME PAGE */
+@media (max-width: 900px) {
+
+  .container {
+    flex-direction: column;
+  }
+
+  .order-panel {
+    display: none;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+
+}
