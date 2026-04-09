@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   Laptop,
@@ -26,6 +27,7 @@ import { socket } from '../socket'
 
 function Inventory() {
   // inventory list + UI state
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -62,6 +64,13 @@ function Inventory() {
     stock_quantity: "10",
     description: ""
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   // Fetch inventory items from backend once on mount
   useEffect(() => {
