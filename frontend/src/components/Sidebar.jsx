@@ -19,8 +19,16 @@ function Sidebar({
 }) {
 
   const role = localStorage.getItem("role") || "worker";
-  const user = JSON.parse(localStorage.getItem("user"));
-  const username = user?.username || "User";
+  
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("user"));
+  } catch {
+    user = null;
+  }
+  
+  const username =
+    localStorage.getItem("username") || user?.username || "User";
 
   // State for mobile menu toggle
   const [isMobileOpen, setIsMobileOpen] = useState(false);
