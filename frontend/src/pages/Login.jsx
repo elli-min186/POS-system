@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Store, EyeOff, Eye } from "lucide-react";
 import "../css/login.css";
-import loginImage from "../assets/login.jpeg";
+import loginImage from "../assets/login.jpg";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
