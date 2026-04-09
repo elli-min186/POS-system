@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {
+import { useNavigate } from "react-router-dom";import {
   LayoutGrid,
   Laptop,
   TabletSmartphone,
@@ -25,6 +25,7 @@ import { socket } from '../socket';
 
 function Home() {
   const TAX_RATE = 0.13;
+  const navigate = useNavigate();
 
   // ---------------- STATE ----------------
   const [allProducts, setAllProducts] = useState([]);
@@ -45,6 +46,13 @@ function Home() {
   };
 
   // ---------------- SOCKET & INITIAL FETCH ----------------
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+    
   useEffect(() => {
     fetchItems();
 
