@@ -7,16 +7,19 @@ function Earnings() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
   const role = localStorage.getItem("role") || "worker";
 
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
   if (role !== "owner") {
     return <Navigate to="/" replace />;
   }
 
   // Fetch invoices
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     fetch("http://localhost:8080/api/invoices", {
       headers: {
         Authorization: `Bearer ${token}`,
