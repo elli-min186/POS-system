@@ -87,12 +87,23 @@ function UserModal() {
   };
 
   const handleDeleteUser = async (id, username) => {
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-
-    if (username === currentUser.username) {
+    let currentUser = null;
+  
+    try {
+      currentUser = JSON.parse(localStorage.getItem("user"));
+    } catch {
+      currentUser = null;
+    }
+  
+    const currentUsername =
+      localStorage.getItem("username") || currentUser?.username;
+  
+    if (username === currentUsername) {
       alert("You cannot delete yourself");
       return;
     }
+
+  try {
 
     try {
       const token = localStorage.getItem("token");
