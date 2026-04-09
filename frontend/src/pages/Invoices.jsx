@@ -9,7 +9,12 @@ function Invoices() {
   const [loading, setLoading] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
+
+  const token = localStorage.getItem("token");
   const role = localStorage.getItem("role") || "worker";
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
   if (role === "worker") {
     return <Navigate to="/" replace />;
   }
@@ -23,7 +28,6 @@ function Invoices() {
 
   // Fetch all invoices from the backend on component mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
     fetchInvoices(token, setInvoices, setLoading);
     socket.connect();
 
