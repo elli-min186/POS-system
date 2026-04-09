@@ -1,8 +1,44 @@
-/* Maintain specific padding for Home product grid */
-.product-grid {
-    padding-top: 10px;
+/* ---------------- BASE LAYOUT ---------------- */
+.container {
+    display: flex;
+    height: 100vh;
 }
 
+.sidebar {
+    width: 220px;
+}
+
+.main-content {
+    flex: 2;
+    overflow-y: auto;
+}
+
+.order-panel {
+    flex: 1;
+    min-width: 280px;
+    border-left: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+/* ---------------- PRODUCT GRID ---------------- */
+.product-grid {
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.product-grid > * {
+    min-width: 0;
+}
+
+/* ---------------- EMPTY STATE ---------------- */
 .empty-state {
     text-align: center;
     color: #94a3b8;
@@ -26,6 +62,7 @@
     height: 28px;
 }
 
+/* ---------------- CART ITEMS ---------------- */
 .cart-item {
     display: flex;
     justify-content: space-between;
@@ -87,66 +124,121 @@
     height: 16px;
 }
 
-.search-bar.home {
-    width: 70%;
+/* ---------------- ORDER LIST SCROLL ---------------- */
+.order-list {
+    flex: 1;
+    overflow-y: auto;
 }
 
+/* ---------------- TOTAL SECTION ---------------- */
+.order-total-section {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding-top: 10px;
+}
+
+/* ---------------- SEARCH ---------------- */
+.search-bar.home {
+    width: 70%;
+    max-width: 500px;
+}
+
+/* ---------------- QUANTITY CONTROLS ---------------- */
 .quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .qty-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
 
-  border: 1px solid var(--border);
-  background: #f8fafc;
-  color: var(--text-dark);
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    color: var(--text-dark);
 
-  font-size: 0.9rem;
-  font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 600;
 
-  cursor: pointer;
-  transition: 0.2s;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 .qty-btn:hover {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
 .qty-value {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 500;
+    min-width: 20px;
+    text-align: center;
+    font-weight: 500;
 }
 
+/* ---------------- BUTTON IMPROVEMENTS ---------------- */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+}
+
+/* ---------------- UTIL ---------------- */
 .hidden {
     display: none !important;
 }
 
+body {
+    overflow-x: hidden;
+}
+
+/* ---------------- TABLET ---------------- */
+@media (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---------------- MOBILE ---------------- */
 @media screen and (max-width: 768px) {
-          .container {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          
-          .sidebar {
-            width: 100%;
-            order: 1;
-          }
+    .container {
+        flex-direction: column;
+    }
 
-          .main-content {
-            width: 100%;
-            order: 2;
-          }
+    .sidebar {
+        width: 100%;
+        order: 1;
 
-          .order-panel {
-            width: 100%;
-            order: 3;
-          }
-        }
+        display: flex;
+        overflow-x: auto;
+    }
+
+    .main-content {
+        width: 100%;
+        order: 2;
+        padding: 10px;
+    }
+
+    .order-panel {
+        width: 100%;
+        order: 3;
+
+        border-left: none;
+        border-top: 1px solid var(--border);
+
+        position: static;
+        height: auto;
+        padding: 10px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search-bar.home {
+        width: 100%;
+    }
+}

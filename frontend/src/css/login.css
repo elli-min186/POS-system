@@ -1,12 +1,13 @@
+/* ---------------- BASE LAYOUT ---------------- */
 .login-page {
     display: flex;
     min-height: 100vh;
-    background-color: var(--light-bg); /* Use your light background variable */
+    background-color: var(--light-bg);
 }
 
-/* Form Column */
+/* ---------------- FORM COLUMN ---------------- */
 .login-form-column {
-    flex: 1; /* Split screen layout */
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,7 +16,7 @@
     box-sizing: border-box;
 }
 
-/* Branding Header */
+/* ---------------- HEADER ---------------- */
 .login-header {
     text-align: center;
     margin-bottom: 30px;
@@ -24,7 +25,6 @@
     align-items: center;
 }
 
-/* Resize logo icon for the login page */
 .login-header .logo-icon {
     width: 56px;
     height: 56px;
@@ -33,48 +33,37 @@
 }
 
 .login-header h1 {
-    color: var(--text-dark); /* Use your dark text variable */
+    color: var(--text-dark);
     font-size: 1.8rem;
     margin-bottom: 5px;
 }
 
 .login-header p {
-    color: var(--text-grey); /* Use your grey text variable */
+    color: var(--text-grey);
     font-size: 0.9rem;
 }
 
-/* Form Card (matching product/modal cards in style) */
+/* ---------------- CARD ---------------- */
 .login-card {
-    background: var(--white); /* Use your white background variable */
+    background: var(--white);
     width: 100%;
     max-width: 420px;
     padding: 40px;
     border-radius: 16px;
-    border: 1px solid var(--border); /* Use your border variable */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
+/* ---------------- FORM ---------------- */
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Spacing between form fields */
+    gap: 15px;
 }
 
-/* Password Input Group (reusing .form-group structure) */
-.password-group {
-    position: relative;
-    margin-bottom: 5px; /* Less margin before forgot link */
-}
-
-.password-input-wrapper {
-    position: relative;
-}
-
-/* Reset individual input styling to match existing form inputs */
-/* You might not need to reset these if they are already styled globally for input tags */
 .login-card input {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--white);
@@ -84,7 +73,16 @@
     box-sizing: border-box;
 }
 
-/* Styling for the password toggle button */
+/* ---------------- PASSWORD ---------------- */
+.password-group {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
 .password-toggle-btn {
     position: absolute;
     right: 12px;
@@ -92,19 +90,15 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #cbd5e1; /* Reusing a light color for default state */
+    color: #cbd5e1;
     cursor: pointer;
-    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    transition: color 0.2s;
 }
 
 .password-toggle-btn:hover {
-    color: var(--text-grey); /* Highlight on hover */
+    color: var(--text-grey);
 }
 
 .password-toggle-btn svg {
@@ -112,14 +106,22 @@
     height: 18px;
 }
 
-/* Forgot Password link styling */
+/* ---------------- BUTTON ---------------- */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+/* ---------------- FORGOT PASSWORD ---------------- */
 .forgot-password {
     text-align: right;
-    margin-bottom: 10px; /* Spacing before sign-in button */
+    margin-bottom: 10px;
 }
 
 .forgot-password a {
-    color: var(--primary); /* Reuse primary blue for links */
+    color: var(--primary);
     font-size: 0.85rem;
     text-decoration: none;
 }
@@ -128,33 +130,40 @@
     text-decoration: underline;
 }
 
-/* --- Illustration Column --- */
+/* ---------------- IMAGE ---------------- */
 .login-illustration-column {
-    flex: 1; /* Split screen layout */
+    flex: 1;
     display: flex;
-    overflow: hidden; /* Prevent scaling issues */
+    overflow: hidden;
 }
 
 .login-illustration-column img {
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
+/* ---------------- GLOBAL FIX ---------------- */
+body {
+    overflow-x: hidden;
+}
+
+/* ---------------- MOBILE ---------------- */
 @media (max-width: 768px) {
     .login-page {
         flex-direction: column;
     }
 
     .login-illustration-column {
-        display: none; /* Hide the image column on smaller screens */
+        display: none;
     }
 
     .login-form-column {
         padding: 20px;
-        justify-content: center;
     }
 
     .login-card {
         padding: 30px 20px;
+        max-width: 100%;
     }
 }
