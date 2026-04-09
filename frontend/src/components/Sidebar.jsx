@@ -4,7 +4,8 @@ import {
   DollarSign,
   Boxes,
   ReceiptText,
-  ShoppingCart
+  Menu,
+  X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -18,9 +19,11 @@ function Sidebar({
 }) {
 
   const role = localStorage.getItem("role") || "worker";
-
   const user = JSON.parse(localStorage.getItem("user"));
   const username = user?.username || "User";
+
+  // State for mobile menu toggle
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -45,103 +48,107 @@ function Sidebar({
   }, []);
 
   return (
-    <aside className="sidebar">
-
-      {/* TOP SECTION */}
-      <div>
+    <aside className={`sidebar ${isMobileOpen ? "open" : ""}`}>
+      
+      {/* Mobile Header Box (Logo + Hamburger) */}
+      <div className="sidebar-mobile-header">
         <div className="logo-area">
           <div className="logo-icon">
             <Store size={20} />
           </div>
-
           <div>
             <h2>TechPOS</h2>
             <span className="subtitle">{time}</span>
-
-            <p className="sidebar-welcome">
-              Welcome, <strong>{username}</strong>
-            </p>
           </div>
         </div>
 
-        {/* Users Management (OWNER ONLY) */}
-        {role === "owner" && (
-          <button
-            className="manage-users-btn"
-            onClick={() => window.dispatchEvent(new Event("openUserModal"))}
-          >
-            Manage Users
-          </button>
-        )}
-
-        {showCategories && (
-          <nav className="categories">
-            <h3>CATEGORIES</h3>
-
-            <ul>
-              {categories.map((cat) => (
-                <li
-                  key={cat.name}
-                  className={selectedCategory === cat.name ? "active" : ""}
-                  onClick={() => onCategoryChange(cat.name)}
-                >
-                  {cat.icon}
-                  {cat.label || cat.name}
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
+        {/* Hamburger Toggle Button (Only visible on mobile via CSS) */}
+        <button 
+          className="hamburger-btn" 
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+        >
+          {isMobileOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
 
-      {/* NAV + LOGOUT */}
-      <div className="sidebar-bottom">
-        <h3>NAVIGATION</h3>
+      {/* Slide-out Content */}
+      <div className="sidebar-content">
+        <div>
+          <p className="sidebar-welcome">
+            Welcome, <strong>{username}</strong>
+          </p>
 
-        <ul>
-          {/* Home (everyone) */}
-          <li className={activePage === "home" ? "active" : ""}>
-            <Link to="/" className="nav-link">
-              <LayoutGrid size={18} />
-              Home
-            </Link>
-          </li>
-
-          {/* Inventory (Manager + Owner) */}
-          {(role === "manager" || role === "owner") && (
-            <li className={activePage === "inventory" ? "active" : ""}>
-              <Link to="/inventory" className="nav-link">
-                <Boxes size={18} />
-                Inventory
-              </Link>
-            </li>
-          )}
-
-          {/* Invoices (Manager + Owner) */}
-          {(role === "manager" || role === "owner") && (
-            <li className={activePage === "invoices" ? "active" : ""}>
-              <Link to="/invoices" className="nav-link">
-                <ReceiptText size={18} />
-                Invoices
-              </Link>
-            </li>
-          )}
-
-          {/* Earnings (OWNER ONLY) */}
+          {/* Users Management (OWNER ONLY) */}
           {role === "owner" && (
-            <li className={activePage === "earnings" ? "active" : ""}>
-              <Link to="/earnings" className="nav-link">
-                <DollarSign size={18} />
-                Earnings
-              </Link>
-            </li>
+            <button
+              className="manage-users-btn"
+              onClick={() => window.dispatchEvent(new Event("openUserModal"))}
+            >
+              Manage Users
+            </button>
           )}
 
-        </ul>
-        {/* LOGOUT */}
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+          {showCategories && (
+            <nav className="categories">
+              <h3>CATEGORIES</h3>
+              <ul>
+                {categories.map((cat) => (
+                  <li
+                    key={cat.name}
+                    className={selectedCategory === cat.name ? "active" : ""}
+                    onClick={() => {
+                        onCategoryChange(cat.name);
+                        setIsMobileOpen(false); // Close menu on select
+                    }}
+                  >
+                    {cat.icon}
+                    {cat.label || cat.name}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
+
+        {/* NAV + LOGOUT */}
+        <div className="sidebar-bottom">
+          <h3>NAVIGATION</h3>
+          <ul>
+            <li className={activePage === "home" ? "active" : ""}>
+              <Link to="/" className="nav-link">
+                <LayoutGrid size={18} /> Home
+              </Link>
+            </li>
+
+            {(role === "manager" || role === "owner") && (
+              <li className={activePage === "inventory" ? "active" : ""}>
+                <Link to="/inventory" className="nav-link">
+                  <Boxes size={18} /> Inventory
+                </Link>
+              </li>
+            )}
+
+            {(role === "manager" || role === "owner") && (
+              <li className={activePage === "invoices" ? "active" : ""}>
+                <Link to="/invoices" className="nav-link">
+                  <ReceiptText size={18} /> Invoices
+                </Link>
+              </li>
+            )}
+
+            {role === "owner" && (
+              <li className={activePage === "earnings" ? "active" : ""}>
+                <Link to="/earnings" className="nav-link">
+                  <DollarSign size={18} /> Earnings
+                </Link>
+              </li>
+            )}
+          </ul>
+
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
     </aside>
   );

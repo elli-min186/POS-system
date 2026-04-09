@@ -778,6 +778,18 @@ svg {
   border-color: #4f7cff;
 }
 
+/* --- Desktop Hamburger Hide --- */
+.hamburger-btn {
+    display: none;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
 /* --- ANIMATIONS --- */
 @keyframes popup {
     from {
@@ -803,3 +815,123 @@ svg {
     }
 }
 
+/* --- TABLET & MOBILE RESPONSIVENESS --- */
+@media (max-width: 900px) {
+    /* 1. Stack main layout */
+    .container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* 2. Transform Sidebar into Top Navbar */
+    .sidebar {
+        order: 1;
+        width: 100%;
+        height: 70px;
+        padding: 0 20px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        z-index: 1000;
+        position: relative;
+    }
+
+    .sidebar-mobile-header {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo-area {
+        margin-bottom: 0;
+    }
+    
+    .subtitle {
+        display: none; /* Hide time to save space */
+    }
+
+    .hamburger-btn {
+        display: flex;
+        background: transparent;
+        border: none;
+        color: var(--white);
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    /* 3. The Slide-Out Menu Content */
+    .sidebar-content {
+        position: fixed;
+        top: 70px; /* Right below the header */
+        left: -100%; /* Hidden off-screen to the left */
+        width: 260px;
+        height: calc(100vh - 70px);
+        background-color: var(--dark-bg);
+        transition: left 0.3s ease-in-out;
+        padding: 20px;
+        z-index: 999;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        overflow-y: auto;
+    }
+
+    /* When the .open class is added via React state */
+    .sidebar.open .sidebar-content {
+        left: 0;
+    }
+
+    /* 4. Fix Main Content & Tables */
+    .main-content {
+        order: 2;
+        padding: 15px;
+        flex: 1;
+        overflow-y: auto; /* Let the middle section scroll naturally */
+    }
+
+    .top-bar {
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .shared-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .shared-table {
+        min-width: 600px; /* Forces scroll instead of squishing table */
+    }
+
+    /* 5. Transform the Order Panel into a Bottom Section */
+    .order-panel {
+        order: 3;
+        height: 40vh; /* Takes up bottom 40% of screen */
+        border-left: none;
+        border-top: 2px solid var(--border);
+        flex-shrink: 0;
+    }
+
+
+    /* Helper class to completely hide an element on mobile */
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    /* Helper class to make the details panel full screen */
+    .order-panel.full-screen-mobile {
+        height: calc(100vh - 70px) !important; /* Full screen minus the top header */
+        order: 2; /* Snap it right underneath the header */
+        border-top: none;
+    }
+}

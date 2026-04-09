@@ -142,18 +142,19 @@
 
 @media (max-width: 768px) {
     .login-page {
-        flex-direction: column; /* Stack columns on smaller screens */
-    }
-
-    .login-form-column,
-    .login-illustration-column {
-        flex: none; /* Reset flex-grow/shrink */
-        width: 100%;
-        min-height: auto; /* Adjust heights */
+        flex-direction: column;
     }
 
     .login-illustration-column {
-        height: 300px; /* Define height for illustration column when stacked */
-        order: -1; /* Place illustration column on top */
+        display: none; /* Hide the image column on smaller screens */
+    }
+
+    .login-form-column {
+        padding: 20px;
+        justify-content: center;
+    }
+
+    .login-card {
+        padding: 30px 20px;
     }
 }

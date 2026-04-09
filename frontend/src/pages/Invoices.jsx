@@ -190,7 +190,8 @@ function Invoices() {
     <div className="container">
       <Sidebar activePage="invoices" showCategories={false} />
 
-      <main className="main-content">
+      {/* Conditionally hide the invoice list on mobile if an invoice is selected */}
+      <main className={`main-content ${selectedInvoice ? 'hide-on-mobile' : ''}`}>
         <header className="top-bar">
           <div className="header-left">
             <h1>Sales Invoices</h1>
@@ -248,7 +249,8 @@ function Invoices() {
         )}
       </main>
 
-      <aside className="order-panel">
+      {/* Conditionally show full screen or hide entirely on mobile based on selection */}
+      <aside className={`order-panel ${selectedInvoice ? 'full-screen-mobile' : 'hide-on-mobile'}`}>
         <div className="order-header">
           <h3>Invoice Details</h3>
           {selectedInvoice && (

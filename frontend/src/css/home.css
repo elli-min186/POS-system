@@ -137,12 +137,12 @@
           
           .sidebar {
             width: 100%;
-            order: 2;
+            order: 1;
           }
 
           .main-content {
             width: 100%;
-            order: 1;
+            order: 2;
           }
 
           .order-panel {

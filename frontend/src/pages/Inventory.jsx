@@ -51,7 +51,7 @@ function Inventory() {
   const role = localStorage.getItem("role") || "worker"; // fallback for testing
   const isReadOnly = role === "worker";
 
-  
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     brand: "",
@@ -63,7 +63,7 @@ function Inventory() {
     description: ""
   });
 
-// Fetch inventory items from backend once on mount
+  // Fetch inventory items from backend once on mount
   useEffect(() => {
     fetchItems();
     socket.connect();
@@ -295,7 +295,7 @@ function Inventory() {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
-          ,Authorization: `Bearer ${token}`
+          , Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(productToSend)
       });
@@ -399,27 +399,27 @@ function Inventory() {
         activePage="inventory"
       />
 
-      <main className="main-content">
+      <main className={`main-content ${selectedItem ? 'hide-on-mobile' : ''}`}>
         <Header
-  title="Inventory"
-  tagText={`${filteredItems.length} items`}
-  showSearch={true}
-  searchPlaceholder="Search inventory..."
-  searchValue={searchTerm}
-  onSearchChange={(e) => setSearchTerm(e.target.value)}
-  rightAction={
-    !isReadOnly && (
-      <button
-        className="submit-btn inventory-add-btn"
-        onClick={() => setShowModal(true)}
-        type="button"
-      >
-        <Plus size={18} />
-        Add New Product
-      </button>
-    )
-  }
-/>
+          title="Inventory"
+          tagText={`${filteredItems.length} items`}
+          showSearch={true}
+          searchPlaceholder="Search inventory..."
+          searchValue={searchTerm}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          rightAction={
+            !isReadOnly && (
+              <button
+                className="submit-btn inventory-add-btn"
+                onClick={() => setShowModal(true)}
+                type="button"
+              >
+                <Plus size={18} />
+                Add New Product
+              </button>
+            )
+          }
+        />
 
         {loading ? (
           <p>Loading inventory...</p>
@@ -441,7 +441,7 @@ function Inventory() {
         )}
       </main>
 
-      <aside className="order-panel">
+      <aside className={`order-panel ${selectedItem ? 'full-screen-mobile' : 'hide-on-mobile'}`}>
         {selectedItem ? (
           <>
             <div className="order-header">
@@ -454,14 +454,6 @@ function Inventory() {
 
 
             <div className="order-list">
-
-              {/* <div className="form-group">
-                <label>SKU</label>
-                <div className="read-only-value">
-                  {selectedItem.sku || ""}
-                </div>
-              </div> */}
-
               <div className="form-group">
                 <label>Product Name</label>
                 <input
@@ -560,13 +552,13 @@ function Inventory() {
 
             <div className="order-total-section">
               {!isReadOnly && (
-              <button
-                className="submit-btn"
-                type="button"
-                onClick={updateItem}
-              >
-                Save Changes
-              </button>
+                <button
+                  className="submit-btn"
+                  type="button"
+                  onClick={updateItem}
+                >
+                  Save Changes
+                </button>
               )}
             </div>
           </>
@@ -767,15 +759,15 @@ function Inventory() {
               >
                 Cancel
               </button>
-              
+
               {!isReadOnly && (
-              <button
-                type="button"
-                className="submit-btn delete-confirm-btn"
-                onClick={() => confirmDeleteItem(itemToDelete.id)}
-              >
-                Delete
-              </button>
+                <button
+                  type="button"
+                  className="submit-btn delete-confirm-btn"
+                  onClick={() => confirmDeleteItem(itemToDelete.id)}
+                >
+                  Delete
+                </button>
               )}
             </div>
           </div>
