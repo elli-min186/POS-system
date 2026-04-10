@@ -69,6 +69,7 @@ document routes:
 
 ## Error handling
 - invalid route returns 404 error
+- authentication error returns 401 error
 - bad request returns 400 error
 - success returns 200 status code
 
@@ -111,7 +112,7 @@ document routes:
     - socket.js
 - README.md
 
-Document API :
+## Document API :
 - GET:       /api/cart       (Get all cart items) 
 - POST:      /api/cart       (Add item to cart)
 - DELETE:    /api/cart/:id   (Remove item by id)
