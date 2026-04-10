@@ -88,24 +88,23 @@ function UserModal() {
 
   const handleDeleteUser = async (id, username) => {
     let currentUser = null;
-  
+
     try {
       currentUser = JSON.parse(localStorage.getItem("user"));
     } catch {
       currentUser = null;
     }
-  
+
     const currentUsername =
       localStorage.getItem("username") || currentUser?.username;
-  
+
     if (username === currentUsername) {
       alert("You cannot delete yourself");
       return;
     }
 
-  try {
-
     try {
+
       const token = localStorage.getItem("token");
 
       await fetch(`http://localhost:8080/api/users/${id}`, {
