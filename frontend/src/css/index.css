@@ -44,7 +44,27 @@ svg {
     flex-direction: column;
     justify-content: space-between;
     overflow-y: auto;
-    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+}
+
+/* 2. Make the scrollbar thin and dark-mode friendly so it doesn't look clunky */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+    /* Blends into your dark blue */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    /* Subtle white thumb */
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .main-content {
@@ -52,8 +72,8 @@ svg {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    flex: 1;        
-    width: 100%;  
+    flex: 1;
+    width: 100%;
     min-width: 0;
 }
 
@@ -65,6 +85,26 @@ svg {
     overflow: hidden;
     flex: 1;
     overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+}
+
+.shared-table-wrapper::-webkit-scrollbar {
+    width: 6px; /* Vertical scrollbar */
+    height: 6px; /* Horizontal scrollbar */
+}
+
+.shared-table-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.shared-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.shared-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .shared-table {
@@ -336,6 +376,27 @@ svg {
     padding-bottom: 20px;
     flex: 1;
     align-content: start;
+    scrollbar-gutter: stable;
+}
+
+/* 2. Make the scrollbar thin and dark-mode friendly so it doesn't look clunky */
+.product-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.product-grid::-webkit-scrollbar-track {
+    background: transparent;
+    /* Blends into your dark blue */
+}
+
+.product-grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    /* Subtle white thumb */
+    border-radius: 10px;
+}
+
+.product-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .card {
@@ -462,7 +523,7 @@ svg {
     flex-direction: column;
     height: 100vh;
     width: 320px;
-    min-width: 320px;  
+    min-width: 320px;
     flex-shrink: 0;
 }
 
@@ -586,222 +647,223 @@ svg {
 }
 
 .earnings-tags {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .header-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-left: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: 10px;
 }
 
 /* spacing under logo */
 .logo-area {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 /* welcome text */
 .sidebar-welcome {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.7);
-  margin-top: 0px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0px;
 }
 
 /* logout styling */
 .logout-btn {
-  margin-top: 15px;
-  width: 100%;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: white;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 .logout-btn:hover {
-  background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .manage-users-btn {
-  margin-top:  10px;
-  margin-bottom: 10px;
-  width: 100%;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.85);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-align: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
 }
 
 .manage-users-btn:hover {
-  background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .user-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
 .user-modal-card {
-  width: 360px;
-  max-width: 90vw;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    width: 360px;
+    max-width: 90vw;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
 .user-modal-card h2 {
-  margin-bottom: 16px;
-  font-size: 1.2rem;
-  color: #1e293b;
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+    color: #1e293b;
 }
 
 .user-modal-card input,
 .user-modal-card select {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.95rem;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
 }
 
 .user-modal-actions {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .user-modal-actions .submit-btn,
 .user-modal-actions .cancel-btn {
-  flex: 1;
-  width: 0;
-  height: 42px;
-  margin: 0;
-  padding: 0 12px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    flex: 1;
+    width: 0;
+    height: 42px;
+    margin: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .user-modal-actions button {
-  flex: 1;
-  height: 42px;
-  box-sizing: border-box;
-  justify-content: center;
+    flex: 1;
+    height: 42px;
+    box-sizing: border-box;
+    justify-content: center;
 }
 
 .user-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    gap: 10px;
 }
 
 .user-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .password-inline-input {
-  width: 120px;
-  height: 28px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+    width: 120px;
+    height: 28px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 
-  font-size: 11px;
-  font-weight: 400;
-  color: #555;
+    font-size: 11px;
+    font-weight: 400;
+    color: #555;
 
-  outline: none;
+    outline: none;
 }
 
 .password-inline-input:focus {
-  border-color: #4f7cff;
+    border-color: #4f7cff;
 }
 
 .secondary-btn {
-  background: #f1f3f5;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
+    background: #f1f3f5;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .secondary-btn:hover {
-  background: #e9ecef;
+    background: #e9ecef;
 }
 
 .save-btn {
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
 }
 
 .save-btn:hover {
-  background: #43a047;
+    background: #43a047;
 }
 
 .danger-btn {
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
+    background: #e53935;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .danger-btn:hover {
-  background: #c62828;
+    background: #c62828;
 }
 
 .cancel-btn-small {
-  background: #ccc;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
+    background: #ccc;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .cancel-btn-small:hover {
-  background: #bdbdbd;
+    background: #bdbdbd;
 }
 
 .user-edit-row input {
-  width: 135px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 12px;
-  outline: none;
+    width: 135px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    outline: none;
 }
 
 .user-edit-row input:focus {
-  border-color: #4f7cff;
+    border-color: #4f7cff;
 }
 
 /* --- Desktop Hamburger Hide --- */
@@ -844,14 +906,8 @@ svg {
 
 /* --- TABLET & MOBILE RESPONSIVENESS --- */
 
-/* Switches to 3 columns on smaller desktop/tablet screens */
-@media (max-width: 1339px) {
-    .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 @media (max-width: 900px) {
+
     /* 1. Stack main layout */
     .container {
         display: flex;
@@ -884,9 +940,10 @@ svg {
     .logo-area {
         margin-bottom: 0;
     }
-    
+
     .subtitle {
-        display: none; /* Hide time to save space */
+        display: none;
+        /* Hide time to save space */
     }
 
     .hamburger-btn {
@@ -903,15 +960,17 @@ svg {
     /* 3. The Slide-Out Menu Content */
     .sidebar-content {
         position: fixed;
-        top: 70px; /* Right below the header */
-        left: -100%; /* Hidden off-screen to the left */
+        top: 70px;
+        /* Right below the header */
+        left: -100%;
+        /* Hidden off-screen to the left */
         width: 260px;
         height: calc(100vh - 70px);
         background-color: var(--dark-bg);
         transition: left 0.3s ease-in-out;
         padding: 20px;
         z-index: 999;
-        box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
         overflow-y: auto;
     }
 
@@ -925,7 +984,8 @@ svg {
         order: 2;
         padding: 15px;
         flex: 1;
-        overflow-y: auto; /* Let the middle section scroll naturally */
+        overflow-y: auto;
+        /* Let the middle section scroll naturally */
     }
 
     .top-bar {
@@ -945,21 +1005,20 @@ svg {
     }
 
     .shared-table {
-        min-width: 600px; /* Forces scroll instead of squishing table */
+        min-width: 600px;
+        /* Forces scroll instead of squishing table */
     }
 
     /* 5. Transform the Order Panel into a Bottom Section */
     .order-panel {
         order: 3;
-        height: 40vh; /* Takes up bottom 40% of screen */
+        height: 40vh;
+        /* Takes up bottom 40% of screen */
         border-left: none;
         border-top: 2px solid var(--border);
         flex-shrink: 0;
     }
 
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
     /* Hides the top navbar when the panel is open */
     .container.hide-mobile-nav .sidebar {
@@ -973,18 +1032,19 @@ svg {
 
     /* Helper class to make the details panel full screen */
     .order-panel.full-screen-mobile {
-        display: flex !important; 
+        display: flex !important;
         flex-direction: column;
-        
+
         /* Break out of normal layout and cover everything */
-        position: fixed !important; 
+        position: fixed !important;
         top: 0;
         left: 0;
         width: 100% !important;
-        height: 100vh !important; 
-        background-color: var(--white); /* To prevent bleeding */
+        height: 100vh !important;
+        background-color: var(--white);
+        /* To prevent bleeding */
         border: none;
-        padding: 0; 
+        padding: 0;
         margin: 0;
     }
 }
