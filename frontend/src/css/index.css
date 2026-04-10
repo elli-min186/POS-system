@@ -153,7 +153,7 @@ svg {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: var(--white);
 }
 
@@ -601,7 +601,7 @@ svg {
 .sidebar-welcome {
   font-size: 0.75rem;
   color: rgba(255,255,255,0.7);
-  margin-top: 4px;
+  margin-top: 0px;
 }
 
 /* logout styling */
@@ -621,6 +621,7 @@ svg {
 }
 
 .manage-users-btn {
+  margin-top:  10px;
   margin-bottom: 10px;
   width: 100%;
   background: rgba(255,255,255,0.02);
@@ -676,7 +677,25 @@ svg {
 .user-modal-actions {
   display: flex;
   gap: 10px;
-  margin-top: 6px;
+}
+
+.user-modal-actions .submit-btn,
+.user-modal-actions .cancel-btn {
+  flex: 1;
+  width: 0;
+  height: 42px;
+  margin: 0;
+  padding: 0 12px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-modal-actions button {
+  flex: 1;
+  height: 42px;
+  box-sizing: border-box;
+  justify-content: center;
 }
 
 .user-row {

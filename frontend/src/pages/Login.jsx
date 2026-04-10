@@ -39,7 +39,7 @@ function Login() {
       localStorage.setItem("username", data.user.username);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/");
+      window.location.href = "/";
     } catch (err) {
       setError("Server is not responding. Please try again.");
     }

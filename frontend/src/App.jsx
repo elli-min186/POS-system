@@ -45,7 +45,7 @@ function App() {
           <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} />} />
         </Routes>
 
-        {/* 🔥 GLOBAL MODAL */}
+        {/* GLOBAL MODAL */}
         {isLoggedIn && <UserModal />}
       </>
     </Router>
