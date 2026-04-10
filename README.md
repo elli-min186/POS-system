@@ -60,6 +60,14 @@ The application incorporates Role-Based Access Control (RBAC) to simulate a real
 - Manager: ```manager1``` / ```123456``` <i>(Can manage inventory and process refunds)</i>
 - Owner: ```owner1``` / ```123456``` <i>(Full system access)</i>
 
+
+### How to Use
+1. <b>Login</b>: Use the provided test credentials (e.g., worker1 / 123456).
+2. <b>Inventory</b>: Managers and Owners can add/edit products.
+3. <b>Checkout</b>: Add items to the cart and process the sale. This triggers a real-time stock deduction.
+4. <b>Invoices & Refunds</b>: Access historical data via the Invoices tab. Refunds automatically restock items if processed within 14 days.
+5. <b>Earnings</b>: Owner can access the Earnings tab to keep track of their units sold and sales revenue.
+
 ## Route
 document routes:
 - /            (Home)
@@ -75,6 +83,7 @@ document routes:
 - success returns 200 status code
 
 ## Project Structure
+```
 - /backend
     - /data
         - invoices.json
@@ -112,6 +121,7 @@ document routes:
     - main.jsx
     - socket.js
 - README.md
+```
 
 ## Document API
 
