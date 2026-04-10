@@ -10,7 +10,8 @@ The application incorporates Role-Based Access Control (RBAC) to simulate a real
 - Real-Time Synchronization: Inventory changes, completed checkouts, and processed refunds are instantly broadcasted to all connected clients via WebSockets.
 - Inventory Management: Add, edit, and remove products (restricted to managers/owners).
 - Sales & Checkout: Process orders, calculate taxes/totals, and automatically deduct stock from the database.
-- Invoice & Refund Management: * View all historical sales data.
+- Invoice & Refund Management: 
+    -  View all historical sales data.
     - Process full or partial refunds for eligible invoices (within a 14-day window).
     - Automatically restock inventory upon refund.
 
@@ -112,10 +113,30 @@ document routes:
     - socket.js
 - README.md
 
-## Document API :
-- GET:       /api/cart       (Get all cart items) 
-- POST:      /api/cart       (Add item to cart)
-- DELETE:    /api/cart/:id   (Remove item by id)
+## Document API
+
+All protected routes require a valid JWT token in the Authorization header.
+### Authentication
+- POST:  /api/login              (User login)
+- POST:  /api/register           (Create new user - owner only)
+- GET:   /api/me                 (Get current user info)
+
+### Users (Owner Only)
+- GET:    /api/users             (Get all users)
+- PUT:    /api/users/:id         (Update user password)
+- DELETE: /api/users/:id         (Delete user)
+
+### Products / Inventory
+- GET:    /api/items             (Get all products)
+- GET:    /api/items/:id         (Get single product)
+- POST:   /api/items             (Create product - manager/owner)
+- PUT:    /api/items/:id         (Update product - manager/owner)
+- DELETE: /api/items/:id         (Delete product - manager/owner)
+
+### Invoices / Checkout
+- POST:  /api/invoices           (Create invoice / checkout)
+- GET:   /api/invoices           (Get all invoices - manager/owner)
+- POST:  /api/invoices/:id/refund (Process refund - manager/owner)
 
 
 ## Challenges & Successes
