@@ -424,7 +424,7 @@ function Inventory() {
                 type="button"
               >
                 <Plus size={18} />
-                Add New Product
+                <span>Add New Product</span>
               </button>
             )
           }

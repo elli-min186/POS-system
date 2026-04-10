@@ -115,4 +115,22 @@
 
 .submit-btn.inventory-add-btn {
     margin: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: fit-content; 
+    padding: 10px 20px; 
+}
+
+@media (min-width: 900px) and (max-width: 1300px) {
+    .submit-btn.inventory-add-btn span {
+        display: none; /* Hides the text on small screens */
+    }
+    
+    .submit-btn.inventory-add-btn {
+        padding: 10px; /* Makes the button a tidy square for the icon */
+    }
 }
