@@ -223,6 +223,13 @@ body {
 
     .order-panel {
         order: 3;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        max-height: none;
+        position: static;
+        border-left: none;
+        border-top: 1px solid var(--border);
         padding: 0;
     }
 
@@ -232,5 +239,59 @@ body {
 
     .search-bar.home {
         width: 100%;
+    }
+}
+
+/* ---------------- MOBILE ORDER PANEL TOGGLE ---------------- */
+.mobile-order-toggle,
+.mobile-close-btn {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .order-panel {
+        display: none;
+    }
+
+    .order-panel.mobile-order-open {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        width: 100%;
+        height: 100vh;
+        min-width: 0;
+        background: var(--white);
+        border: none;
+    }
+
+    .mobile-order-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 2100;
+        border: none;
+        border-radius: 999px;
+        background: var(--primary);
+        color: var(--white);
+        padding: 12px 18px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .mobile-close-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
     }
 }
