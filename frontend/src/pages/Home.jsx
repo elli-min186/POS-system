@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";import {
+import { useNavigate } from "react-router-dom";
+import {
   LayoutGrid,
   Laptop,
   TabletSmartphone,
@@ -33,7 +34,8 @@ function Home() {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [showMobileOrder, setShowMobileOrder] = useState(false);
+  
   // ---------------- FETCH PRODUCTS ----------------
   const fetchItems = async () => {
     try {
@@ -270,12 +272,23 @@ function Home() {
       </main>
 
       {/* ---------------- ORDER PANEL ---------------- */}
-      <aside className="order-panel">
+      <aside className={`order-panel ${showMobileOrder ? "mobile-order-open" : ""}`}>
         <div className="order-header">
           <h3>Current Order</h3>
-          <button className="clear-cart-btn" onClick={clearCart}>
-            Clear
-          </button>
+
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button className="clear-cart-btn" onClick={clearCart}>
+              Clear
+            </button>
+
+            <button
+              className="mobile-close-btn"
+              onClick={() => setShowMobileOrder(false)}
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         <div className="order-list">
@@ -356,6 +369,13 @@ function Home() {
           </button>
         </div>
       </aside>
+      <button
+        className="mobile-order-toggle"
+        onClick={() => setShowMobileOrder(true)}
+        type="button"
+      >
+        View Order ({cart.length})
+      </button>
     </div>
   );
 }
