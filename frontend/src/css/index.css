@@ -36,6 +36,7 @@ svg {
 }
 
 .sidebar {
+    width: 220px;
     background-color: var(--dark-bg);
     color: var(--text-grey);
     padding: 20px;
@@ -51,6 +52,9 @@ svg {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    flex: 1;        
+    width: 100%;  
+    min-width: 0;
 }
 
 /* --- INVOICES AND EARNING PAGE SHARED TABLE --- */
@@ -326,7 +330,7 @@ svg {
 .product-grid {
     padding-top: 10px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
     gap: 15px;
     overflow-y: auto;
     padding-bottom: 20px;
@@ -457,6 +461,9 @@ svg {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    width: 320px;
+    min-width: 320px;  
+    flex-shrink: 0;
 }
 
 .order-header {
@@ -834,7 +841,16 @@ svg {
     }
 }
 
+
 /* --- TABLET & MOBILE RESPONSIVENESS --- */
+
+/* Switches to 3 columns on smaller desktop/tablet screens */
+@media (max-width: 1339px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 900px) {
     /* 1. Stack main layout */
     .container {
@@ -941,6 +957,9 @@ svg {
         flex-shrink: 0;
     }
 
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
     /* Helper class to completely hide an element on mobile */
     .hide-on-mobile {

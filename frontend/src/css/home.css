@@ -4,26 +4,8 @@
     height: 100vh;
 }
 
-.sidebar {
-    width: 220px;
-}
-
 .main-content {
-    flex: 2;
     overflow-y: auto;
-}
-
-.order-panel {
-    flex: 1;
-    min-width: 280px;
-    border-left: 1px solid var(--border);
-
-    display: flex;
-    flex-direction: column;
-
-    position: sticky;
-    top: 0;
-    height: 100vh;
 }
 
 /* ---------------- PRODUCT GRID ---------------- */
@@ -248,7 +230,7 @@ body {
     display: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 900px) {
     .order-panel {
         display: none;
     }
