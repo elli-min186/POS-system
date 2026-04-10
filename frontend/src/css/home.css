@@ -211,7 +211,6 @@ body {
     .sidebar {
         width: 100%;
         order: 1;
-
         display: flex;
         overflow-x: auto;
     }
@@ -223,15 +222,8 @@ body {
     }
 
     .order-panel {
-        width: 100%;
         order: 3;
-
-        border-left: none;
-        border-top: 1px solid var(--border);
-
-        position: static;
-        height: auto;
-        padding: 10px;
+        padding: 0;
     }
 
     .product-grid {
@@ -241,22 +233,4 @@ body {
     .search-bar.home {
         width: 100%;
     }
-}
-
-
-/* 📱 MOBILE FIX FOR HOME PAGE */
-@media (max-width: 900px) {
-
-  .container {
-    flex-direction: column;
-  }
-
-  .order-panel {
-    display: none;
-  }
-
-  .main-content {
-    width: 100%;
-  }
-
 }
