@@ -961,6 +961,11 @@ svg {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    /* Hides the top navbar when the panel is open */
+    .container.hide-mobile-nav .sidebar {
+        display: none !important;
+    }
+
     /* Helper class to completely hide an element on mobile */
     .hide-on-mobile {
         display: none !important;
@@ -968,8 +973,18 @@ svg {
 
     /* Helper class to make the details panel full screen */
     .order-panel.full-screen-mobile {
-        height: calc(100vh - 70px) !important; /* Full screen minus the top header */
-        order: 2; /* Snap it right underneath the header */
-        border-top: none;
+        display: flex !important; 
+        flex-direction: column;
+        
+        /* Break out of normal layout and cover everything */
+        position: fixed !important; 
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100vh !important; 
+        background-color: var(--white); /* To prevent bleeding */
+        border: none;
+        padding: 0; 
+        margin: 0;
     }
 }

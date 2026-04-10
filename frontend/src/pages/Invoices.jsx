@@ -191,7 +191,7 @@ function Invoices() {
   });
 
   return (
-    <div className="container">
+    <div className={`container ${selectedInvoice ? "hide-mobile-nav" : ""}`}>
       <Sidebar activePage="invoices" showCategories={false} />
 
       {/* Conditionally hide the invoice list on mobile if an invoice is selected */}

@@ -276,7 +276,7 @@ function Home() {
         <div className="order-header">
           <h3>Current Order</h3>
 
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
             <button className="clear-cart-btn" onClick={clearCart}>
               Clear
             </button>
@@ -369,13 +369,15 @@ function Home() {
           </button>
         </div>
       </aside>
-      <button
-        className="mobile-order-toggle"
-        onClick={() => setShowMobileOrder(true)}
-        type="button"
-      >
-        View Order ({cart.length})
-      </button>
+      {!showMobileOrder && (
+        <button
+          className="mobile-order-toggle"
+          onClick={() => setShowMobileOrder(true)}
+          type="button"
+        >
+          View Order ({cart.length})
+        </button>
+      )}
     </div>
   );
 }

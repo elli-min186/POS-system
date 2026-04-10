@@ -399,7 +399,7 @@ function Inventory() {
   };
 
   return (
-    <div className="container">
+    <div className={`container ${selectedItem ? "hide-mobile-nav" : ""}`}>
       <Sidebar
         showCategories={true}
         categories={categories}
