@@ -117,11 +117,21 @@ Document API :
 - DELETE:    /api/cart/:id   (Remove item by id)
 
 
-## Challenges & Success
-1. Understanding how frontend and backend communicate
-2. Implementing RESTful routes correctly
-3. Managing state without a database
-4. Coordinating features across team members
+## Challenges & Successes
+
+### Challenges
+- Maintaining consistent UI styling across components.
+- Handling authentication and routing without refresh issues.
+- Keeping layouts consistent across different pages.
+- Coordinating frontend and backend data structures.
+- Implementing real-time updates with Socket.io.
+
+### Successes
+- Built a full-stack POS system using the MERN stack.
+- Implemented role-based access control (worker, manager, owner).
+- Achieved real-time synchronization across users.
+- Developed a responsive and user-friendly interface.
+- Integrated inventory, checkout, invoices, and refunds into one system.
 
 Gained understanding of the following:
 - Express routing 
